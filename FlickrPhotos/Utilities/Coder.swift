@@ -8,7 +8,6 @@
 import Foundation
 
 class Coder {
-    
     func encode<T>(_ data: T,
                    fileName: String = #file) throws -> Data where T: Codable {
         do {

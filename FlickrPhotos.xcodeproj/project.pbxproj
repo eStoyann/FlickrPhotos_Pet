@@ -198,6 +198,7 @@
 				CF237BF52C46940E0004AA65 /* Info.plist */,
 				CF237BF22C46940E0004AA65 /* LaunchScreen.storyboard */,
 				CF237C4E2C4A677A0004AA65 /* LoaderView.swift */,
+				CF8FF6872C6E4945004BC285 /* Utilities */,
 				CF237C522C4A82330004AA65 /* API */,
 				CF237C5E2C4A84270004AA65 /* Protocols */,
 				CF237C502C4A818C0004AA65 /* Extensions */,
@@ -302,13 +303,9 @@
 			children = (
 				CF237C552C4A82680004AA65 /* NetworkAPI */,
 				CF237C432C4942360004AA65 /* PhotosSearchTermsHistoryLocalStorage.swift */,
-				CF237C132C46A9610004AA65 /* ThreadSafeVariable.swift */,
-				CF237C242C47C6F30004AA65 /* Publisher.swift */,
 				CF237C472C495A100004AA65 /* PhotosSearchTermsBarDelegate.swift */,
 				CF237C412C49421F0004AA65 /* PhotosSearchTermsHistoryTableViewDataSource.swift */,
 				CF237C2C2C47F6970004AA65 /* PhotosCollectionViewDataSource.swift */,
-				CF237C762C4C348C0004AA65 /* Coder.swift */,
-				CF8FF6832C6D004B004BC285 /* State.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -354,6 +351,17 @@
 				CF4E3B2E2C525BC3000CE2B7 /* ImagesLoadingManagerTest.swift */,
 			);
 			path = FlickrPhotosUnitTests;
+			sourceTree = "<group>";
+		};
+		CF8FF6872C6E4945004BC285 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				CF237C132C46A9610004AA65 /* ThreadSafeVariable.swift */,
+				CF237C242C47C6F30004AA65 /* Publisher.swift */,
+				CF237C762C4C348C0004AA65 /* Coder.swift */,
+				CF8FF6832C6D004B004BC285 /* State.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
