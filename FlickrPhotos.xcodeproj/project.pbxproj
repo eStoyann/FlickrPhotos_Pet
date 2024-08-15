@@ -68,6 +68,7 @@
 		CF8FF6802C6CF4C0004BC285 /* HTTPScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF67F2C6CF4C0004BC285 /* HTTPScheme.swift */; };
 		CF8FF6822C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6812C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift */; };
 		CF8FF6842C6D004B004BC285 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6832C6D004B004BC285 /* State.swift */; };
+		CF8FF6862C6E47C3004BC285 /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6852C6E47C3004BC285 /* AppManager.swift */; };
 		CFB38DF12C4FBD2200DA02BA /* Extension+Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB38DF02C4FBD2200DA02BA /* Extension+Error.swift */; };
 		CFB38DF32C50176100DA02BA /* HTTPResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB38DF22C50176100DA02BA /* HTTPResult.swift */; };
 /* End PBXBuildFile section */
@@ -147,6 +148,7 @@
 		CF8FF67F2C6CF4C0004BC285 /* HTTPScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPScheme.swift; sourceTree = "<group>"; };
 		CF8FF6812C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Protocol+URLRequestBuilder.swift"; sourceTree = "<group>"; };
 		CF8FF6832C6D004B004BC285 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		CF8FF6852C6E47C3004BC285 /* AppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppManager.swift; sourceTree = "<group>"; };
 		CFB38DF02C4FBD2200DA02BA /* Extension+Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+Error.swift"; sourceTree = "<group>"; };
 		CFB38DF22C50176100DA02BA /* HTTPResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -191,6 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				CF237BE72C46940D0004AA65 /* AppDelegate.swift */,
+				CF8FF6852C6E47C3004BC285 /* AppManager.swift */,
 				CF237BF02C46940E0004AA65 /* Assets.xcassets */,
 				CF237BF52C46940E0004AA65 /* Info.plist */,
 				CF237BF22C46940E0004AA65 /* LaunchScreen.storyboard */,
@@ -493,6 +496,7 @@
 				CF237C192C46B6BD0004AA65 /* PhotosEndpointBuilder.swift in Sources */,
 				CF237C3B2C493B5F0004AA65 /* Extension+UITableView.swift in Sources */,
 				CF8FF6802C6CF4C0004BC285 /* HTTPScheme.swift in Sources */,
+				CF8FF6862C6E47C3004BC285 /* AppManager.swift in Sources */,
 				CF237BE82C46940D0004AA65 /* AppDelegate.swift in Sources */,
 				CF237C352C4932A90004AA65 /* PhotosSearchTermsHistoryViewController.swift in Sources */,
 				CF237C292C47E4A90004AA65 /* Extension+UICollectionViewCell.swift in Sources */,
