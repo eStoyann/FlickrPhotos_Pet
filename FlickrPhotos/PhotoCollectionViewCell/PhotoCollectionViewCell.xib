@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="gTV-IL-0wX" customClass="PhotoCollectionViewCell" customModule="FlickrPhotos" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="268" height="242"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="268" height="242"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dUl-C2-rYM">
+                        <rect key="frame" x="0.0" y="0.0" width="268" height="242"/>
+                    </imageView>
+                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="3kX-Kp-qGf">
+                        <rect key="frame" x="124" y="111" width="20" height="20"/>
+                    </activityIndicatorView>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="3kX-Kp-qGf" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="ET5-5f-KmK"/>
+                <constraint firstItem="3kX-Kp-qGf" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="N6Q-MB-xjp"/>
+                <constraint firstAttribute="trailing" secondItem="dUl-C2-rYM" secondAttribute="trailing" id="UAk-nJ-p07"/>
+                <constraint firstAttribute="bottom" secondItem="dUl-C2-rYM" secondAttribute="bottom" id="VRx-DH-EMV"/>
+                <constraint firstItem="dUl-C2-rYM" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="uha-mo-iZd"/>
+                <constraint firstItem="dUl-C2-rYM" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="vMd-fv-mZJ"/>
+            </constraints>
+            <size key="customSize" width="268" height="242"/>
+            <connections>
+                <outlet property="activityIndicatorView" destination="3kX-Kp-qGf" id="Xu6-Lk-cpZ"/>
+                <outlet property="photoImageView" destination="dUl-C2-rYM" id="l9D-Yr-Pmh"/>
+            </connections>
+            <point key="canvasLocation" x="131.29770992366412" y="87.323943661971839"/>
+        </collectionViewCell>
+    </objects>
+</document>
