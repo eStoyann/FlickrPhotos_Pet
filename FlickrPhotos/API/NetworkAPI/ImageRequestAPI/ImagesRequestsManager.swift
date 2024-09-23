@@ -1,5 +1,5 @@
 //
-//  ImagesLoadingManager.swift
+//  ImagesRequestsManager.swift
 //  FlickrPhotos
 //
 //  Created by Evgeniy Stoyan on 16.07.2024.
@@ -21,7 +21,7 @@ protocol ImageLoader: AnyObject {
 }
 
 
-final class ImagesLoadingManager<Buffer, Cache, Request>: ImageLoader where Buffer: ImageRequestsBuffer,
+final class ImagesRequestsManager<Buffer, Cache, Request>: ImageLoader where Buffer: ImageRequestsBuffer,
                                                                                       Request == Buffer.Request,
                                                                                       Cache: ImagesCache {
     private let buffer: Buffer

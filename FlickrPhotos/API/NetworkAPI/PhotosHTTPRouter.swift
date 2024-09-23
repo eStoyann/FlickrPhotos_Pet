@@ -1,5 +1,5 @@
 //
-//  PhotosEndpointBuilder.swift
+//  PhotosHTTPRouter.swift
 //  FlickrPhotos
 //
 //  Created by Evgeniy Stoyan on 16.07.2024.
@@ -7,30 +7,28 @@
 
 import Foundation
 
-protocol EndpointBuilder {
-    var endpoint: Endpoint {get}
-}
-
-enum PhotosEndpointBuilder: EndpointBuilder {
+enum PhotosHTTPRouter {
     case photos(page: Int, pageSize: Int, safeSearch: Int = 1)
     case photo(farm: Int, server: String, id: String, secret: String, size: String = "")
     case searchPhotos(text: String, page: Int, pageSize: Int, safeSearch: Int = 1)
     
-    var endpoint: Endpoint {
+    var endpoint: HTTPEndpoint {
         switch self {
         case .photos, .searchPhotos:
-            return Endpoint(host: HTTPHost.baseURL.path,
-                            urlPath: "/services/rest/",
+            let path = "/services/rest/"
+            let host = HTTPHost.baseURL.path
+            return Endpoint(host: host,
+                            path: path,
                             queryParameters: queryParameters)
         case let .photo(farm, server, id, secret, size):
+            let host = HTTPHost.photoURL(farm).path
             let sizePath = size.isNotEmpty ? "_\(size)" : ""
-            let urlPath = "/\(server)/\(id)_\(secret)\(sizePath).jpg"
-            return Endpoint(host: HTTPHost.photoURL(farm).path,
-                            urlPath: urlPath)
+            let path = "/\(server)/\(id)_\(secret)\(sizePath).jpg"
+            return Endpoint(host: host, path: path)
         }
     }
 }
-private extension PhotosEndpointBuilder {
+private extension PhotosHTTPRouter {
     var queryParameters: [String: String]? {
         switch self {
         case let .photos(page, pageSize, safeSearch):

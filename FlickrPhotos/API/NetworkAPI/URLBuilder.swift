@@ -1,13 +1,16 @@
 //
-//  Endpoint.swift
+//  URLBuilder.swift
 //  FlickrPhotos
 //
 //  Created by Evgeniy Stoyan on 14.08.2024.
 //
 
 import Foundation
+protocol HTTPURLBuilder {
+    var url: URL? {get}
+}
 
-struct Endpoint {
+struct URLBuilder: HTTPURLBuilder {
     typealias QueryParameters = [String: String]
     private var components: URLComponents
     
@@ -17,32 +20,14 @@ struct Endpoint {
     
     init(scheme: HTTPScheme = .https,
          host: String,
-         urlPath: String,
+         path: String,
          queryParameters: QueryParameters? = nil) {
         self.components = URLComponents()
         self.components.scheme = scheme.rawValue
         self.components.host = host
-        self.components.path = urlPath
+        self.components.path = path
         self.components.percentEncodedQueryItems = queryParameters?.map {
             URLQueryItem(name: $0.key, value: $0.value)
         }
-    }
-}
-extension Endpoint {
-    var scheme: HTTPScheme? {
-        HTTPScheme(rawValue: components.scheme ?? "")
-    }
-    var host: String? {
-        components.host
-    }
-    var path: String {
-        components.path
-    }
-    var queryParameters: [String: String] {
-        var queryParameters = [String: String]()
-        components.queryItems?.forEach{ item in
-            queryParameters[item.name] = item.value
-        }
-        return queryParameters
     }
 }
