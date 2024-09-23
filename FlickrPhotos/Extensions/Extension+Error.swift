@@ -8,7 +8,16 @@
 import Foundation
 
 extension Error {
-    var ns: NSError {
+    private var ns: NSError {
         self as NSError
+    }
+    var code: Int {
+        ns.code
+    }
+    var isURLRequestCancelled: Bool {
+        ns.code == NSURLErrorCancelled
+    }
+    var isInternetConnectionLost: Bool {
+        ns.code == NSURLErrorNotConnectedToInternet
     }
 }

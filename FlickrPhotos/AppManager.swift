@@ -18,11 +18,11 @@ final class AppManager {
     func presentPhotosViewController() {
         let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
         let buffer = ImageRequestsBufferProvider<ImageRequest>()
-        let imageLoadingManager = ImagesLoadingManager(buffer: buffer, cache: cache)
+        let imageRequestsManager = ImagesRequestsManager(buffer: buffer, cache: cache)
         let networkManager = PhotosNetworkManager()
         let storage = PhotosSearchTermsHistoryLocalStorage()
         let viewModel = PhotosViewModel(networkManager: networkManager,
-                                        imageRequestsManager: imageLoadingManager,
+                                        imageRequestsManager: imageRequestsManager,
                                         imageRequestHTTPClient: URLSession.shared,
                                         photosSearchTermsHistoryLocalStorage: storage)
         let photosViewController: PhotosViewController = .loadFromNib()

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol ImageURLRequest: AnyObject, Hashable {
+protocol ImageURLRequest: Hashable {
     typealias CompletionHandler = (UIImage?) -> Void
     var url: URL{get}
     var isCancelled: Bool{get}
@@ -45,7 +45,7 @@ final class ImageRequest: ImageURLRequest {
     func start(_ finished: @escaping CompletionHandler) {
         print("\n+++ Start loading image from \(urlRequest)...")
         let _urlRequest = urlRequest
-        task = client.fetch(request: urlRequest) {[weak self] result in
+        task = client.load(request: urlRequest) {[weak self] result in
             guard let self else {return}
             guard _urlRequest == urlRequest else {
                 print("\n--- Different urls")
@@ -62,10 +62,11 @@ final class ImageRequest: ImageURLRequest {
                     finished(nil)
                 }
             case let .failure(error):
-                print("\n--- Error: \(error.localizedDescription)")
-                finished(nil)
-            case .cancelled:
-                print("\n--- Image loading operation \(_urlRequest) is cancelled")
+                if error.isURLRequestCancelled {
+                    print("\n--- Image loading operation \(_urlRequest) is cancelled")
+                } else {
+                    print("\n--- Error: \(error.localizedDescription)")
+                }
                 finished(nil)
             }
         }

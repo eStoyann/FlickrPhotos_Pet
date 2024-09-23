@@ -181,14 +181,14 @@ final class PhotosViewModelTest: XCTestCase {
     }
 }
 private extension PhotosViewModelTest {
-    func sut(options: MockPhotosLoadHTTPClient.Status) -> PhotosViewModel<ImagesLoadingManager<ImageRequestsBufferProvider<ImageRequest>, ImagesLocalCache, ImageRequest>, ImageRequest> {
+    func sut(options: MockPhotosLoadHTTPClient.Status) -> PhotosViewModel<ImagesRequestsManager<ImageRequestsBufferProvider<ImageRequest>, ImagesLocalCache, ImageRequest>, ImageRequest> {
         
         let mockHTTPClient = MockPhotosLoadHTTPClient(options: options)
         let nm = PhotosNetworkManager(client: mockHTTPClient)
         
         let buffer = ImageRequestsBufferProvider<ImageRequest>()
         let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
-        let irm = ImagesLoadingManager(buffer: buffer, cache: cache)
+        let irm = ImagesRequestsManager(buffer: buffer, cache: cache)
         
         let ls = PhotosSearchTermsHistoryLocalStorage()
         

@@ -18,11 +18,11 @@
 		CF237C0A2C46A1270004AA65 /* ImageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C092C46A1270004AA65 /* ImageRequest.swift */; };
 		CF237C0C2C46A4630004AA65 /* Extension+URLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C0B2C46A4630004AA65 /* Extension+URLSession.swift */; };
 		CF237C0E2C46A8410004AA65 /* ImageRequestsBufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C0D2C46A8410004AA65 /* ImageRequestsBufferProvider.swift */; };
-		CF237C102C46A9260004AA65 /* ImagesLoadingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C0F2C46A9260004AA65 /* ImagesLoadingManager.swift */; };
+		CF237C102C46A9260004AA65 /* ImagesRequestsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C0F2C46A9260004AA65 /* ImagesRequestsManager.swift */; };
 		CF237C122C46A9400004AA65 /* ImagesLocalCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C112C46A9400004AA65 /* ImagesLocalCache.swift */; };
 		CF237C142C46A9610004AA65 /* ThreadSafeVariable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C132C46A9610004AA65 /* ThreadSafeVariable.swift */; };
 		CF237C162C46A9C00004AA65 /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C152C46A9C00004AA65 /* Extension+String.swift */; };
-		CF237C192C46B6BD0004AA65 /* PhotosEndpointBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C182C46B6BD0004AA65 /* PhotosEndpointBuilder.swift */; };
+		CF237C192C46B6BD0004AA65 /* PhotosHTTPRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C182C46B6BD0004AA65 /* PhotosHTTPRouter.swift */; };
 		CF237C1F2C47C14B0004AA65 /* PhotosResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C1E2C47C14B0004AA65 /* PhotosResponse.swift */; };
 		CF237C212C47C1570004AA65 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C202C47C1570004AA65 /* Photo.swift */; };
 		CF237C252C47C6F30004AA65 /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF237C242C47C6F30004AA65 /* Publisher.swift */; };
@@ -58,15 +58,14 @@
 		CF4E3B2D2C51613B000CE2B7 /* MockImageRequestHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E3B2C2C51613B000CE2B7 /* MockImageRequestHTTPClient.swift */; };
 		CF4E3B2F2C525BC3000CE2B7 /* ImagesLoadingManagerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E3B2E2C525BC3000CE2B7 /* ImagesLoadingManagerTest.swift */; };
 		CF4E3B312C5261C7000CE2B7 /* ImagesLocalCacheTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E3B302C5261C7000CE2B7 /* ImagesLocalCacheTest.swift */; };
-		CF8FF6722C6CD904004BC285 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6712C6CD904004BC285 /* Endpoint.swift */; };
-		CF8FF6742C6CD949004BC285 /* PhotosURLRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6732C6CD949004BC285 /* PhotosURLRequestBuilder.swift */; };
+		CF8FF6722C6CD904004BC285 /* URLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6712C6CD904004BC285 /* URLBuilder.swift */; };
+		CF8FF6742C6CD949004BC285 /* HTTPEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6732C6CD949004BC285 /* HTTPEndpoint.swift */; };
 		CF8FF6762C6CF1C1004BC285 /* Extension+URLSessionTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6752C6CF1C1004BC285 /* Extension+URLSessionTask.swift */; };
 		CF8FF6782C6CF481004BC285 /* HTTPHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6772C6CF481004BC285 /* HTTPHost.swift */; };
 		CF8FF67A2C6CF493004BC285 /* HTTPAPICredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6792C6CF493004BC285 /* HTTPAPICredentials.swift */; };
 		CF8FF67C2C6CF4A5004BC285 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF67B2C6CF4A5004BC285 /* HTTPMethod.swift */; };
 		CF8FF67E2C6CF4B2004BC285 /* HTTPHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF67D2C6CF4B2004BC285 /* HTTPHeader.swift */; };
 		CF8FF6802C6CF4C0004BC285 /* HTTPScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF67F2C6CF4C0004BC285 /* HTTPScheme.swift */; };
-		CF8FF6822C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6812C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift */; };
 		CF8FF6842C6D004B004BC285 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6832C6D004B004BC285 /* State.swift */; };
 		CF8FF6862C6E47C3004BC285 /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8FF6852C6E47C3004BC285 /* AppManager.swift */; };
 		CFB38DF12C4FBD2200DA02BA /* Extension+Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB38DF02C4FBD2200DA02BA /* Extension+Error.swift */; };
@@ -97,11 +96,11 @@
 		CF237C092C46A1270004AA65 /* ImageRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRequest.swift; sourceTree = "<group>"; };
 		CF237C0B2C46A4630004AA65 /* Extension+URLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+URLSession.swift"; sourceTree = "<group>"; };
 		CF237C0D2C46A8410004AA65 /* ImageRequestsBufferProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRequestsBufferProvider.swift; sourceTree = "<group>"; };
-		CF237C0F2C46A9260004AA65 /* ImagesLoadingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesLoadingManager.swift; sourceTree = "<group>"; };
+		CF237C0F2C46A9260004AA65 /* ImagesRequestsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesRequestsManager.swift; sourceTree = "<group>"; };
 		CF237C112C46A9400004AA65 /* ImagesLocalCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesLocalCache.swift; sourceTree = "<group>"; };
 		CF237C132C46A9610004AA65 /* ThreadSafeVariable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeVariable.swift; sourceTree = "<group>"; };
 		CF237C152C46A9C00004AA65 /* Extension+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+String.swift"; sourceTree = "<group>"; };
-		CF237C182C46B6BD0004AA65 /* PhotosEndpointBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosEndpointBuilder.swift; sourceTree = "<group>"; };
+		CF237C182C46B6BD0004AA65 /* PhotosHTTPRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosHTTPRouter.swift; sourceTree = "<group>"; };
 		CF237C1E2C47C14B0004AA65 /* PhotosResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosResponse.swift; sourceTree = "<group>"; };
 		CF237C202C47C1570004AA65 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		CF237C242C47C6F30004AA65 /* Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.swift; sourceTree = "<group>"; };
@@ -138,15 +137,14 @@
 		CF4E3B2C2C51613B000CE2B7 /* MockImageRequestHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImageRequestHTTPClient.swift; sourceTree = "<group>"; };
 		CF4E3B2E2C525BC3000CE2B7 /* ImagesLoadingManagerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesLoadingManagerTest.swift; sourceTree = "<group>"; };
 		CF4E3B302C5261C7000CE2B7 /* ImagesLocalCacheTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesLocalCacheTest.swift; sourceTree = "<group>"; };
-		CF8FF6712C6CD904004BC285 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
-		CF8FF6732C6CD949004BC285 /* PhotosURLRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosURLRequestBuilder.swift; sourceTree = "<group>"; };
+		CF8FF6712C6CD904004BC285 /* URLBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLBuilder.swift; sourceTree = "<group>"; };
+		CF8FF6732C6CD949004BC285 /* HTTPEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPEndpoint.swift; sourceTree = "<group>"; };
 		CF8FF6752C6CF1C1004BC285 /* Extension+URLSessionTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+URLSessionTask.swift"; sourceTree = "<group>"; };
 		CF8FF6772C6CF481004BC285 /* HTTPHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPHost.swift; sourceTree = "<group>"; };
 		CF8FF6792C6CF493004BC285 /* HTTPAPICredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPAPICredentials.swift; sourceTree = "<group>"; };
 		CF8FF67B2C6CF4A5004BC285 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		CF8FF67D2C6CF4B2004BC285 /* HTTPHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPHeader.swift; sourceTree = "<group>"; };
 		CF8FF67F2C6CF4C0004BC285 /* HTTPScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPScheme.swift; sourceTree = "<group>"; };
-		CF8FF6812C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Protocol+URLRequestBuilder.swift"; sourceTree = "<group>"; };
 		CF8FF6832C6D004B004BC285 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		CF8FF6852C6E47C3004BC285 /* AppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppManager.swift; sourceTree = "<group>"; };
 		CFB38DF02C4FBD2200DA02BA /* Extension+Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+Error.swift"; sourceTree = "<group>"; };
@@ -235,7 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				CF237C092C46A1270004AA65 /* ImageRequest.swift */,
-				CF237C0F2C46A9260004AA65 /* ImagesLoadingManager.swift */,
+				CF237C0F2C46A9260004AA65 /* ImagesRequestsManager.swift */,
 				CF237C0D2C46A8410004AA65 /* ImageRequestsBufferProvider.swift */,
 				CF237C112C46A9400004AA65 /* ImagesLocalCache.swift */,
 			);
@@ -314,16 +312,16 @@
 			isa = PBXGroup;
 			children = (
 				CF237C172C46AA230004AA65 /* ImageRequestAPI */,
-				CF8FF6712C6CD904004BC285 /* Endpoint.swift */,
+				CF8FF6712C6CD904004BC285 /* URLBuilder.swift */,
 				CFB38DF22C50176100DA02BA /* HTTPResult.swift */,
 				CF8FF67F2C6CF4C0004BC285 /* HTTPScheme.swift */,
 				CF8FF67D2C6CF4B2004BC285 /* HTTPHeader.swift */,
 				CF8FF6772C6CF481004BC285 /* HTTPHost.swift */,
 				CF8FF6792C6CF493004BC285 /* HTTPAPICredentials.swift */,
 				CF8FF67B2C6CF4A5004BC285 /* HTTPMethod.swift */,
+				CF8FF6732C6CD949004BC285 /* HTTPEndpoint.swift */,
 				CF237C452C4959FD0004AA65 /* PhotosNetworkManager.swift */,
-				CF8FF6732C6CD949004BC285 /* PhotosURLRequestBuilder.swift */,
-				CF237C182C46B6BD0004AA65 /* PhotosEndpointBuilder.swift */,
+				CF237C182C46B6BD0004AA65 /* PhotosHTTPRouter.swift */,
 			);
 			path = NetworkAPI;
 			sourceTree = "<group>";
@@ -333,7 +331,6 @@
 			children = (
 				CF237C5A2C4A83FB0004AA65 /* Protocol+NibLoadableView.swift */,
 				CF237C5C2C4A84100004AA65 /* Protocol+ReusableView.swift */,
-				CF8FF6812C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -469,7 +466,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF8FF6822C6CF6D4004BC285 /* Protocol+URLRequestBuilder.swift in Sources */,
 				CF237C462C4959FD0004AA65 /* PhotosNetworkManager.swift in Sources */,
 				CF237C252C47C6F30004AA65 /* Publisher.swift in Sources */,
 				CF237C3E2C493BCE0004AA65 /* SearchTermTableViewCell.swift in Sources */,
@@ -493,7 +489,7 @@
 				CF237C022C4696D30004AA65 /* PhotosViewController.swift in Sources */,
 				CF237C122C46A9400004AA65 /* ImagesLocalCache.swift in Sources */,
 				CF8FF6842C6D004B004BC285 /* State.swift in Sources */,
-				CF8FF6742C6CD949004BC285 /* PhotosURLRequestBuilder.swift in Sources */,
+				CF8FF6742C6CD949004BC285 /* HTTPEndpoint.swift in Sources */,
 				CF237C392C493B3D0004AA65 /* Extension+UITableViewCell.swift in Sources */,
 				CF237C572C4A83CD0004AA65 /* Extension+UIView.swift in Sources */,
 				CF237C162C46A9C00004AA65 /* Extension+String.swift in Sources */,
@@ -501,7 +497,7 @@
 				CF8FF67E2C6CF4B2004BC285 /* HTTPHeader.swift in Sources */,
 				CF237C2B2C47E4C20004AA65 /* Extension+UICollectionView.swift in Sources */,
 				CF8FF67A2C6CF493004BC285 /* HTTPAPICredentials.swift in Sources */,
-				CF237C192C46B6BD0004AA65 /* PhotosEndpointBuilder.swift in Sources */,
+				CF237C192C46B6BD0004AA65 /* PhotosHTTPRouter.swift in Sources */,
 				CF237C3B2C493B5F0004AA65 /* Extension+UITableView.swift in Sources */,
 				CF8FF6802C6CF4C0004BC285 /* HTTPScheme.swift in Sources */,
 				CF8FF6862C6E47C3004BC285 /* AppManager.swift in Sources */,
@@ -511,13 +507,13 @@
 				CFB38DF32C50176100DA02BA /* HTTPResult.swift in Sources */,
 				CF237C0A2C46A1270004AA65 /* ImageRequest.swift in Sources */,
 				CF8FF67C2C6CF4A5004BC285 /* HTTPMethod.swift in Sources */,
-				CF8FF6722C6CD904004BC285 /* Endpoint.swift in Sources */,
+				CF8FF6722C6CD904004BC285 /* URLBuilder.swift in Sources */,
 				CF237C2D2C47F6970004AA65 /* PhotosCollectionViewDataSource.swift in Sources */,
 				CF8FF6762C6CF1C1004BC285 /* Extension+URLSessionTask.swift in Sources */,
 				CF237C4B2C4968540004AA65 /* ActivityIndicatorCollectionReusableView.swift in Sources */,
 				CF237C4F2C4A677A0004AA65 /* LoaderView.swift in Sources */,
 				CF237C622C4A87510004AA65 /* PhotosSearchTermsHistoryViewModel.swift in Sources */,
-				CF237C102C46A9260004AA65 /* ImagesLoadingManager.swift in Sources */,
+				CF237C102C46A9260004AA65 /* ImagesRequestsManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

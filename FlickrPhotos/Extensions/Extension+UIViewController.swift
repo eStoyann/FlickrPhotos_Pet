@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 extension UIViewController: NibLoadableView {
-    static func loadFromNib<Controller>() -> Controller where Controller: UIViewController {
-        Controller(nibName: Controller.nibName, bundle: .main)
+    static func loadFromNib<VC>() -> VC where VC: UIViewController {
+        VC(nibName: VC.nibName, bundle: .main)
     }
 }

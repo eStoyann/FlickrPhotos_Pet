@@ -14,9 +14,8 @@ protocol ImagesCache: AnyObject {
     func clean()
 }
 final class ImagesLocalCache: ImagesCache {
-    
-    private let cache: NSCache<NSString, UIImage>
     private let threadSafeCount = ThreadSafeVariable<Int>(.zero)
+    private let cache: NSCache<NSString, UIImage>
     
     var count: Int {
         threadSafeCount.value

@@ -15,7 +15,6 @@ class LoaderView: UIView {
         let effect = UIBlurEffect(style: UIBlurEffect.Style.light)
         let effectView = UIVisualEffectView(effect: effect)
         effectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
         return effectView
     }()
     private lazy var spinner: UIActivityIndicatorView = {
@@ -24,7 +23,6 @@ class LoaderView: UIView {
         aiv.hidesWhenStopped = true
         return aiv
     }()
-    private(set) var isAnimating = false
     
     //MARK: - Lifecycle
     override init(frame: CGRect) {
@@ -44,43 +42,139 @@ class LoaderView: UIView {
     //MARK: - Public methods
     func startAnimation(duration: TimeInterval = 0.25,
                         delay: Double = 0,
-                        _ completion: (() -> Void)? = nil) {
-        guard !isAnimating else { return }
-        isAnimating = true
+                        _ completion: ((Bool) -> Void)? = nil) {
+        guard !spinner.isAnimating else {return}
         spinner.startAnimating()
-        UIView.animate(withDuration: duration,
-                       delay: delay,
-                       options: .curveEaseInOut) {
-            self.alpha = 1
-        } completion: { _ in
-            completion?()
-        }
+        let animation = LoaderViewAnimationFactory.present(view: self,
+                                                           duration: duration,
+                                                           delay: delay).animation
+        animation.run(completion)
     }
     func stopAnimation(duration: TimeInterval = 0.25,
                        delay: Double = 0,
                        _ completion: (() -> Void)? = nil) {
-        guard isAnimating else { return }
-        UIView.animate(withDuration: duration,
-                       delay: delay,
-                       options: .curveEaseInOut) {
-            self.alpha = 0
-        } completion: {[weak self] _ in
+        guard spinner.isAnimating else {return}
+        let animation = LoaderViewAnimationFactory.hide(view: self,
+                                                        duration: duration,
+                                                        delay: delay).animation
+        animation.run {[weak self] _ in
             self?.spinner.stopAnimating()
-            self?.isAnimating = false
-            self?.removeFromSuperview()
             completion?()
         }
+        
     }
     
     //MARK: - Private method
     private func setupUI() {
         isUserInteractionEnabled = true
-        addSubview(blurView)
-        addSubview(spinner)
+        addSubviews(blurView, spinner)
         alpha = 0
+    }
+}
+extension UIView {
+    func addSubviews(_ subviews: UIView...) {
+        subviews.forEach(addSubview)
     }
 }
 
 
 
+
+
+
+
+protocol AnimationFactory {
+    var animation: Animation {get}
+}
+
+
+enum LoaderViewAnimationFactory: AnimationFactory {
+    case present(view: UIView, duration: CGFloat, delay: CGFloat)
+    case hide(view: UIView, duration: CGFloat, delay: CGFloat)
+    
+    var animation: Animation {
+        switch self {
+        case let .present(view, duration, delay):
+            return Animation { finished in
+                UIView.animate(withDuration: duration,
+                               delay: delay,
+                               options: .curveEaseInOut) {
+                    view.alpha = 1
+                } completion: { isFinished in
+                    finished?(isFinished)
+                }
+            }
+        case let .hide(view, duration, delay):
+            return Animation { finished in
+                UIView.animate(withDuration: duration,
+                               delay: delay,
+                               options: .curveEaseInOut) {
+                    view.alpha = 0
+                } completion: { isFinished in
+                    finished?(isFinished)
+                    view.removeFromSuperview()
+                }
+            }
+        }
+    }
+}
+
+class Animation {
+    typealias Completion = (Bool) -> Void
+    typealias Body = (Completion?) -> Void
+    
+    private let body: Body
+    private let id = UUID()
+    private(set) var isAnimating = false
+    private var previous: Animation?
+    private var next: Animation?
+    private var isLast: Bool {
+        next == nil
+    }
+    private var isFirst: Bool {
+        previous == nil
+    }
+    
+    init(_ body: @escaping Body) {
+        self.body = body
+    }
+    
+    func combine(with animation: Animation) -> Animation {
+        if !isLast {
+            _ = next!.combine(with: animation)
+        } else {
+            next = animation
+            next!.previous = self
+        }
+        return self
+    }
+    func run(_ completion: Completion?) {
+        if !isAnimating {
+            isAnimating = true
+            body {[weak self] isFinished in
+                guard let self else {return}
+                if isFinished && self.next != nil {
+                    self.next?.run {
+                        self.isAnimating = false
+                        completion?($0)
+                        self.previous = nil
+                        self.next = nil
+                    }
+                } else {
+                    isAnimating = false
+                    completion?(isFinished)
+                }
+            }
+        }
+    }
+    
+    deinit {
+        print(String(describing: self))
+    }
+}
+extension Animation: CustomStringConvertible{
+    var description: String {
+        "Animation(\(id))"
+    }
+}
 

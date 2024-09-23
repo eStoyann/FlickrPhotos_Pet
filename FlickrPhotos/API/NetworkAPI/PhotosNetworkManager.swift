@@ -43,11 +43,9 @@ final class PhotosNetworkManager: PhotosNetworkService {
             finished(.failure(Errors.emptySearchTerm))
             return
         }
-        let endpoint = PhotosEndpointBuilder.searchPhotos(text: searchTerm,
-                                                          page: page,
-                                                          pageSize: pageSize).endpoint
-        let builder = PhotosURLRequestBuilder(endpoint: endpoint)
-        fetchRequest(fromBuilder: builder) { result in
+        load(.photosBy(query: searchTerm,
+                       page: page,
+                       pageSize: pageSize)) { result in
             switch result {
             case var .success(response):
                 response.searchTerm = searchTerm
@@ -62,10 +60,7 @@ final class PhotosNetworkManager: PhotosNetworkService {
     func getRecentPhotos(forPage page: Int,
                          pageSize: Int,
                          _ finished: @escaping CompletionHandler) {
-        let endpoint = PhotosEndpointBuilder.photos(page: page,
-                                                    pageSize: pageSize).endpoint
-        let builder = PhotosURLRequestBuilder(endpoint: endpoint)
-        fetchRequest(fromBuilder: builder, finished)
+        load(.photos(page: page, pageSize: pageSize), finished)
     }
     func loadNextPhotosPage(for searchTerm: String?,
                             page: Int,
@@ -91,12 +86,12 @@ final class PhotosNetworkManager: PhotosNetworkService {
     }
 }
 private extension PhotosNetworkManager {
-    func fetchRequest(fromBuilder builder: PhotosURLRequestBuilder,
-                      receiveOn queue: DispatchQueue = .main,
-                      _ finished: @escaping CompletionHandler) {
+    func load(_ route: PhotosHTTPRouter,
+              receiveOn queue: DispatchQueue = .main,
+              _ finished: @escaping CompletionHandler) {
         do {
-            let request = try builder.buildRequest()
-            let task = client.fetch(request: request) {[weak self] result in
+            let request = try route.endpoint.request()
+            let task = client.load(request: request) {[weak self] result in
                 guard let self else {return}
                 switch result {
                 case let .success((data, httpResponse)):
@@ -120,11 +115,11 @@ private extension PhotosNetworkManager {
                     }
                 case let .failure(error):
                     queue.async {
-                        finished(.failure(error))
-                    }
-                case .cancelled:
-                    queue.async {
-                        finished(.cancelled)
+                        if error.isURLRequestCancelled {
+                            finished(.cancelled)
+                        } else {
+                            finished(.failure(error))
+                        }
                     }
                 }
             }

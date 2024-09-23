@@ -104,7 +104,13 @@ extension PhotosViewModel: PhotosDataSource {
             let imageRequest = IRequest(url: url,
                                         timeout: 60,
                                         client: imageRequestHTTPClient)
-            imageRequestsManager.runAndCacheResult(of: imageRequest, receiveOn: .main, finished)
+            imageRequestsManager.runAndCacheResult(of: imageRequest, receiveOn: .main) { image in
+                image?.prepareForDisplay { preparedImage in
+                    DispatchQueue.main.async {
+                        finished(preparedImage)
+                    }
+                } ?? finished(nil)
+            }
         }
     }
     func isLoadingImage(at indexPath: IndexPath) -> Bool {
@@ -158,12 +164,12 @@ private extension PhotosViewModel {
     func url(at indexPath: IndexPath) -> URL? {
         if numberOfPhotos(in: indexPath.section) > indexPath.row {
             let photo = photosResponse!.pageInfo.photos[indexPath.row]
-            let endpoint = PhotosEndpointBuilder.photo(farm: photo.farm,
+            let endpoint = PhotosHTTPRouter.photo(farm: photo.farm,
                                                       server: photo.server,
                                                       id: photo.id,
                                                       secret: photo.secret,
                                                       size: "q").endpoint
-            if let url = endpoint.url {
+            if let url = try? endpoint.request().url {
                 return url
             }
         }

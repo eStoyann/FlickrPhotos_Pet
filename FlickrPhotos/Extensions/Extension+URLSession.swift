@@ -9,19 +9,15 @@ import Foundation
 import UIKit
 
 protocol HTTPClient {
-    typealias CompletionHandler = (HTTPResult<(Data, HTTPURLResponse), Error>) -> Void
-    func fetch(request: URLRequest,
+    typealias CompletionHandler = (Result<(Data, HTTPURLResponse), Error>) -> Void
+    func load(request: URLRequest,
                _ finished: @escaping CompletionHandler) -> HTTPClientTask
 }
 extension URLSession: HTTPClient {
-    func fetch(request: URLRequest, _ finished: @escaping CompletionHandler) -> HTTPClientTask {
+    func load(request: URLRequest, _ finished: @escaping CompletionHandler) -> HTTPClientTask {
         dataTask(with: request) { data, response, error in
             guard error == nil else {
-                if error!.ns.code == NSURLErrorCancelled {
-                    finished(.cancelled)
-                } else {                
-                    finished(.failure(error!))
-                }
+                finished(.failure(error!))
                 return
             }
             guard let httpResponse = response as? HTTPURLResponse else {

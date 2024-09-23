@@ -49,7 +49,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let url = URL(string: "http://test")!
         let buffer = ImageRequestsBufferProvider<ImageRequest>()
         let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
-        let sut = ImagesLoadingManager(buffer: buffer, cache: cache)
+        let sut = ImagesRequestsManager(buffer: buffer, cache: cache)
         
         cache[url] = .placeholder
         
@@ -170,10 +170,10 @@ final class ImagesLoadingManagerTest: XCTestCase {
     }
 }
 private extension ImagesLoadingManagerTest {
-    func sut() -> ImagesLoadingManager<ImageRequestsBufferProvider<ImageRequest>, ImagesLocalCache, ImageRequest> {
+    func sut() -> ImagesRequestsManager<ImageRequestsBufferProvider<ImageRequest>, ImagesLocalCache, ImageRequest> {
         let buffer = ImageRequestsBufferProvider<ImageRequest>()
         let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
-        return ImagesLoadingManager(buffer: buffer, cache: cache)
+        return ImagesRequestsManager(buffer: buffer, cache: cache)
     }
     func request(_ url: URL, status: MockImageRequestHTTPClient.Status = .success) -> ImageRequest {
         let mockClient = MockImageRequestHTTPClient(status: status)

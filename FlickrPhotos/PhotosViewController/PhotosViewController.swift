@@ -18,9 +18,6 @@ class PhotosViewController: UIViewController {
     private var photosCollectionViewDataSource: PhotosCollectionViewDataProviderProtocol?
     private var photoSearchTermsDelegate: UISearchBarDelegate?
     private var loaderView: LoaderView?
-    private var searchController: UISearchController? {
-        navigationItem.searchController
-    }
     
     //MARK: - Public properties
     var viewModel: ViewModel?
@@ -68,8 +65,8 @@ class PhotosViewController: UIViewController {
         viewModel?.selectedSearchTerm.bind({[weak self] searchTerm in
             guard let self else {return}
             guard searchTerm?.isNotEmpty == true else {return}
-            searchController?.searchBar.text = searchTerm
-            searchController?.searchResultsController?.dismiss(animated: true)
+            navigationItem.searchController?.searchBar.text = searchTerm
+            navigationItem.searchController?.searchResultsController?.dismiss(animated: true)
         })
         viewModel?.nextPagePhotosState.bind({[weak self] state in
             guard let self else {return}
