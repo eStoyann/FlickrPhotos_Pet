@@ -15,9 +15,9 @@ extension Error {
         ns.code
     }
     var isURLRequestCancelled: Bool {
-        ns.code == NSURLErrorCancelled
+        code == NSURLErrorCancelled
     }
     var isInternetConnectionLost: Bool {
-        ns.code == NSURLErrorNotConnectedToInternet
+        code == NSURLErrorNotConnectedToInternet
     }
 }

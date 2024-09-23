@@ -16,7 +16,7 @@ final class AppManager {
         self.window = window ?? UIWindow(frame: UIScreen.main.bounds)
     }
     func presentPhotosViewController() {
-        let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
+        let cache = ImagesLocalCache()
         let buffer = ImageRequestsBufferProvider<ImageRequest>()
         let imageRequestsManager = ImagesRequestsManager(buffer: buffer, cache: cache)
         let networkManager = PhotosNetworkManager()

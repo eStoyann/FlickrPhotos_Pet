@@ -115,11 +115,7 @@ private extension PhotosNetworkManager {
                     }
                 case let .failure(error):
                     queue.async {
-                        if error.isURLRequestCancelled {
-                            finished(.cancelled)
-                        } else {
-                            finished(.failure(error))
-                        }
+                        finished(error.isURLRequestCancelled ? .cancelled : .failure(error))
                     }
                 }
             }

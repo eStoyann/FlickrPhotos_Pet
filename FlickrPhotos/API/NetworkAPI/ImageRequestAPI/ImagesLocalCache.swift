@@ -21,7 +21,7 @@ final class ImagesLocalCache: ImagesCache {
         threadSafeCount.value
     }
     
-    init(countLimit: Int, totalCostLimit: Int) {
+    init(countLimit: Int = 100, totalCostLimit: Int = 1024*1024*10) {
         cache = NSCache<NSString, UIImage>()
         cache.countLimit = countLimit
         cache.totalCostLimit = totalCostLimit
