@@ -10,15 +10,15 @@ import Foundation
 protocol ImageRequestsBuffer {
     associatedtype Request: ImageURLRequest
     var count: Int{get}
-    func add(request: Request)
-    func remove(request: Request)
+    func add(_ request: Request)
+    func remove(_ request: Request)
     func request(forURL url: URL) -> Request?
     func clean()
 }
 extension ImageRequestsBuffer {
     func removeRequest(forURL url: URL) {
         if let request = request(forURL: url) {
-            remove(request: request)
+            remove(request)
         }
     }
 }
@@ -40,7 +40,7 @@ final class ImageRequestsBufferProvider<Request>: ImageRequestsBuffer where Requ
         buffer.count
     }
     
-    func add(request: Request) {
+    func add(_ request: Request) {
         if buffer.insert(request).inserted {
             print("\n+++ New request \(request) is added to buffer. Buffer requests count: \(count)")
         }
@@ -51,7 +51,7 @@ final class ImageRequestsBufferProvider<Request>: ImageRequestsBuffer where Requ
         }
         return nil
     }
-    func remove(request: Request) {
+    func remove(_ request: Request) {
         if let removedRequest = buffer.remove(request) {
             removedRequest.cancel()
             print("\n--- Request \(removedRequest) is removed from buffer. Buffer requests count: \(count)")

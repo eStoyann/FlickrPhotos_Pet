@@ -10,11 +10,12 @@ import UIKit
 
 protocol HTTPClient {
     typealias CompletionHandler = (Result<(Data, HTTPURLResponse), Error>) -> Void
-    func load(request: URLRequest,
-               _ finished: @escaping CompletionHandler) -> HTTPClientTask
+    func load(_ request: URLRequest,
+              _ finished: @escaping CompletionHandler) -> HTTPClientTask
 }
 extension URLSession: HTTPClient {
-    func load(request: URLRequest, _ finished: @escaping CompletionHandler) -> HTTPClientTask {
+    func load(_ request: URLRequest,
+              _ finished: @escaping CompletionHandler) -> HTTPClientTask {
         dataTask(with: request) { data, response, error in
             guard error == nil else {
                 finished(.failure(error!))

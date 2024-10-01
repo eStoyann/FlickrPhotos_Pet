@@ -9,11 +9,9 @@ import Foundation
 
 protocol ImageLoader: AnyObject {
     associatedtype Request: ImageURLRequest
-    var bufferRequestsCount: Int{get}
-    var cachedImagesCount: Int{get}
-    func runAndCacheResult(of request: Request,
-                           receiveOn queue: DispatchQueue,
-                           _ finished: @escaping ImageURLRequest.CompletionHandler)
+    func load(_ request: Request,
+              receiveOn queue: DispatchQueue,
+              _ finished: @escaping ImageURLRequest.CompletionHandler)
     func stopRequest(forURL url: URL)
     func isActiveRequest(forURL url: URL) -> Bool
     func stopAllRequests()
@@ -22,42 +20,33 @@ protocol ImageLoader: AnyObject {
 
 
 final class ImagesRequestsManager<Buffer, Cache, Request>: ImageLoader where Buffer: ImageRequestsBuffer,
-                                                                                      Request == Buffer.Request,
-                                                                                      Cache: ImagesCache {
+                                                                             Request == Buffer.Request,
+                                                                             Cache: ImagesCache {
     private let buffer: Buffer
     private let cache: Cache
-    
-    var bufferRequestsCount: Int {
-        buffer.count
-    }
-    var cachedImagesCount: Int {
-        cache.count
-    }
     
     init(buffer: Buffer, cache: Cache) {
         self.buffer = buffer
         self.cache = cache
     }
     
-    func runAndCacheResult(of request: Request,
-                           receiveOn queue: DispatchQueue = .main,
-                           _ finished: @escaping ImageURLRequest.CompletionHandler) {
-        if cache[request.url] == nil {
+    func load(_ request: Request,
+              receiveOn queue: DispatchQueue = .main,
+              _ finished: @escaping ImageURLRequest.CompletionHandler) {
+        if cache.image(forURL: request.url) == nil {
             if buffer.request(forURL: request.url) == nil {
-                request.start {[weak self] image in
-                    guard let self else {return}
-                    cache[request.url] = image
+                request.start {[cache, buffer] image in
+                    cache.set(image, forURL: request.url)
                     queue.async {
                         finished(image)
-                        self.buffer.remove(request: request)
+                        buffer.remove(request)
                     }
                 }
-                buffer.add(request: request)
+                buffer.add(request)
             }
         } else {
-            queue.async {[weak self] in
-                guard let self else {return}
-                finished(cache[request.url])
+            queue.async {[cache] in
+                finished(cache.image(forURL: request.url))
             }
         }
     }
@@ -68,7 +57,10 @@ final class ImagesRequestsManager<Buffer, Cache, Request>: ImageLoader where Buf
         buffer.clean()
     }
     func isActiveRequest(forURL url: URL) -> Bool {
-        buffer.request(forURL: url) != nil
+        if cache.image(forURL: url) != nil {
+            return false
+        }
+        return buffer.request(forURL: url) != nil
     }
     func cleanCachedData() {
         cache.clean()

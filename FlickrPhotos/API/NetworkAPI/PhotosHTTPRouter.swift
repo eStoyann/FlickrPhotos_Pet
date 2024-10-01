@@ -8,9 +8,16 @@
 import Foundation
 
 enum PhotosHTTPRouter {
-    case photos(page: Int, pageSize: Int, safeLevel: Int = 1)
-    case photo(farm: Int, server: String, id: String, secret: String, size: String = "")
-    case photosBy(query: String, page: Int, pageSize: Int, safeLevel: Int = 1)
+    case photos(page: Page,
+                safeLevel: Int = 1)
+    case photosBy(query: String,
+                  page: Page,
+                  safeLevel: Int = 1)
+    case photo(farm: Int,
+               server: String,
+               id: String,
+               secret: String,
+               resolution: PhotoResolution = .default)
     
     var endpoint: HTTPEndpoint {
         switch self {
@@ -18,14 +25,13 @@ enum PhotosHTTPRouter {
             let path = "/services/rest/"
             let host = HTTPHost.baseURL.path
             let builder = URLBuilder(host: host,
-                            path: path,
-                            queryParameters: queryParameters)
+                                     path: path,
+                                     queryParameters: queryParameters)
             let endpoint = Endpoint(builder: builder)
             return endpoint
-        case let .photo(farm, server, id, secret, size):
+        case let .photo(farm, server, id, secret, resolution):
+            let path = "/\(server)/\(id)_\(secret)\(resolution.path).jpg"
             let host = HTTPHost.photoURL(farm).path
-            let sizePath = size.isNotEmpty ? "_\(size)" : ""
-            let path = "/\(server)/\(id)_\(secret)\(sizePath).jpg"
             let builder = URLBuilder(host: host, path: path)
             let endpoint = Endpoint(builder: builder)
             return endpoint
@@ -35,31 +41,40 @@ enum PhotosHTTPRouter {
 private extension PhotosHTTPRouter {
     var queryParameters: [String: String]? {
         switch self {
-        case let .photos(page, pageSize, safeLevel):
-            var parameters = commonQueryParameters(page: page,
-                                                   pageSize: pageSize,
-                                                   safeLevel: safeLevel)
+        case let .photos(page, safeLevel):
+            var parameters = defaultQueryParameters(page: page,
+                                                    safeLevel: safeLevel)
             parameters["method"] = "flickr.photos.getRecent"
             return parameters
-        case let .photosBy(text, page, pageSize, safeLevel):
-            var parameters = commonQueryParameters(page: page,
-                                                   pageSize: pageSize,
-                                                   safeLevel: safeLevel)
+        case let .photosBy(query, page, safeLevel):
+            var parameters = defaultQueryParameters(page: page,
+                                                    safeLevel: safeLevel)
             parameters["method"] = "flickr.photos.search"
-            parameters["text"] = "\(text)"
+            parameters["text"] = "\(query)"
             return parameters
         case .photo:
             return nil
         }
     }
-    func commonQueryParameters(page: Int, pageSize: Int, safeLevel: Int) -> [String: String] {
+    func defaultQueryParameters(page: Page, safeLevel: Int) -> [String: String] {
         [
             "api_key": "\(HTTPAPICredentials.key)",
             "format": "json",
             "nojsoncallback": "1",
             "safe_search": "\(safeLevel)",
-            "per_page": "\(pageSize)",
-            "page": "\(page)"
+            "per_page": "\(page.size)",
+            "page": "\(page.number)"
         ]
+    }
+}
+
+
+struct Page {
+    let number: Int
+    let size: Int
+    
+    init(number: Int = 1, size: Int = 24) {
+        self.number = number
+        self.size = size
     }
 }

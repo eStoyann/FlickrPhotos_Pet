@@ -15,3 +15,9 @@ extension String {
         !trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
+
+extension URL {
+    var string: NSString {
+        absoluteString.ns
+    }
+}

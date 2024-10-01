@@ -60,6 +60,7 @@ class PhotosViewController: UIViewController {
         photosCollectionViewDataSource = PhotosCollectionViewDataSource(source: viewModel)
         photosCollectionView.delegate = photosCollectionViewDataSource
         photosCollectionView.dataSource = photosCollectionViewDataSource
+        photosCollectionView.prefetchDataSource = photosCollectionViewDataSource
     }
     private func bind() {
         viewModel?.selectedSearchTerm.bind({[weak self] searchTerm in

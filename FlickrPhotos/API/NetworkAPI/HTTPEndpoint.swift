@@ -41,8 +41,8 @@ final class Endpoint: HTTPEndpoint {
         httpHeaders.forEach {
             request.addValue($0.value, forHTTPHeaderField: $0.rawValue)
         }
-        if let parameters = httpMethod.parameters {
-            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        if let httpBody = httpMethod.body {
+            request.httpBody = try httpBody.encode()
         }
         return request
     }

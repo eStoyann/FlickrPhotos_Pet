@@ -15,7 +15,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let sut = sut()
         let expectation = expectation(description: "wait for runAndCacheResult finish successfully")
         
-        sut.runAndCacheResult(of: request(url), receiveOn: .main) { image in
+        sut.load(request(url), receiveOn: .main) { image in
             XCTAssertNotNil(image, "image should not be nil")
             XCTAssertTrue(Thread.isMainThread, "Thread.isMainThread should be true")
             expectation.fulfill()
@@ -28,7 +28,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let sut = sut()
         let expectation = expectation(description: "wait for runAndCacheResult fails")
         
-        sut.runAndCacheResult(of: request(url, status: .failure), receiveOn: .main) { image in
+        sut.load(request(url, status: .failure), receiveOn: .main) { image in
             XCTAssertNil(image, "image should be nil")
             XCTAssertTrue(Thread.isMainThread, "Thread.isMainThread should be true")
             expectation.fulfill()
@@ -40,7 +40,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let url = URL(string: "http://test")!
         let sut = sut()
         
-        sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in}
+        sut.load(request(url), receiveOn: .main) {_ in}
 
         XCTAssertTrue(sut.isActiveRequest(forURL: url), "isActiveRequest should return true")
     }
@@ -53,7 +53,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         
         cache[url] = .placeholder
         
-        sut.runAndCacheResult(of: request(url, status: .failure), receiveOn: .main) { image in
+        sut.load(request(url, status: .failure), receiveOn: .main) { image in
             XCTAssertNotNil(image, "image should not be nil")
             XCTAssertTrue(Thread.isMainThread, "Thread.isMainThread should be true")
             expectation.fulfill()
@@ -64,7 +64,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let url = URL(string: "http://test")!
         let sut = sut()
         
-        sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in}
+        sut.load(request(url), receiveOn: .main) {_ in}
         sut.stopRequest(forURL: url)
         
         XCTAssertFalse(sut.isActiveRequest(forURL: url), "isActiveRequest should return false")
@@ -73,7 +73,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let sut = sut()
         
         let url = URL(string: "http://test")!
-        sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in}
+        sut.load(request(url), receiveOn: .main) {_ in}
         sut.stopAllRequests()
         
         XCTAssertEqual(sut.bufferRequestsCount, 0, "bufferRequestsCount should be equal to zero")
@@ -87,7 +87,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         for i in 1...10 {
             group.enter()
             let url = URL(string: "http://test\(i)")!
-            sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in
+            sut.load(request(url), receiveOn: .main) {_ in
                 group.leave()
             }
         }
@@ -102,7 +102,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         
         for i in 1...3 {
             let url = URL(string: "http://test\(i)")!
-            sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in}
+            sut.load(request(url), receiveOn: .main) {_ in}
         }
         
         XCTAssertEqual(sut.bufferRequestsCount, 3, "bufferRequestsCount should be equal to ten")
@@ -116,7 +116,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         for i in 1...3 {
             group.enter()
             let url = URL(string: "http://test\(i)")!
-            sut.runAndCacheResult(of: request(url), receiveOn: .main) {_ in
+            sut.load(request(url), receiveOn: .main) {_ in
                 group.leave()
             }
         }
@@ -136,7 +136,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         for i in 1...3 {
             group.enter()
             let url = URL(string: "http://test\(i)")!
-            sut.runAndCacheResult(of: request(url, status: .failure), receiveOn: .main) {_ in
+            sut.load(request(url, status: .failure), receiveOn: .main) {_ in
                 group.leave()
             }
         }
@@ -156,7 +156,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         for i in 1...3 {
             group.enter()
             let url = URL(string: "http://test\(i)")!
-            sut.runAndCacheResult(of: request(url, status: .success), receiveOn: .main) {_ in
+            sut.load(request(url, status: .success), receiveOn: .main) {_ in
                 group.leave()
             }
         }

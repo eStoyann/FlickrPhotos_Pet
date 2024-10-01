@@ -8,62 +8,33 @@
 import Foundation
 import UIKit
 
-protocol ImagesCache: AnyObject {
-    var count: Int{get}
-    subscript(_ url: URL) -> UIImage? {get set}
+protocol ImagesCache {
+    func image(forURL url: URL) -> UIImage?
+    func set(_ image: UIImage?, forURL url: URL)
     func clean()
 }
 final class ImagesLocalCache: ImagesCache {
-    private let threadSafeCount = ThreadSafeVariable<Int>(.zero)
     private let cache: NSCache<NSString, UIImage>
     
-    var count: Int {
-        threadSafeCount.value
+    init(countLimit: Int = 0,
+         totalCostLimit: Int = 0) {
+        self.cache = NSCache<NSString, UIImage>()
+        self.cache.countLimit = countLimit
+        self.cache.totalCostLimit = totalCostLimit
     }
-    
-    init(countLimit: Int = 100, totalCostLimit: Int = 1024*1024*10) {
-        cache = NSCache<NSString, UIImage>()
-        cache.countLimit = countLimit
-        cache.totalCostLimit = totalCostLimit
+    func image(forURL url: URL) -> UIImage? {
+        cache.object(forKey: url.string)
     }
-    
-    subscript(_ url: URL) -> UIImage? {
-        get {
-            cache.object(forKey: url.absoluteString.ns)
-        }
-        set {
-            if let image = newValue {
-                if cache.object(forKey: url.absoluteString.ns) == nil {
-                    increaseCounter()
-                    print("\n+++ New image for URL: \(url) is added to cache")
-                }
-                cache.setObject(image, forKey: url.absoluteString.ns)
-            } else {
-                if cache.object(forKey: url.absoluteString.ns) != nil {
-                    decreaseCounter()
-                }
-                cache.removeObject(forKey: url.absoluteString.ns)
-                print("\n--- Image for URL: \(url) is removed from cache")
-            }
-            print("\n+++ Count \(count)")
+    func set(_ image: UIImage?, forURL url: URL) {
+        if let image {
+            cache.setObject(image, forKey: url.string)
+            print("\n+++ New image for URL: \(url) is added to cache")
+        } else {
+            cache.removeObject(forKey: url.string)
+            print("\n--- Image for URL: \(url) is removed from cache")
         }
     }
-    
     func clean() {
         cache.removeAllObjects()
-        threadSafeCount.value = 0
-        print("\n--- All images are removed. Count: \(count)")
-    }
-}
-private extension ImagesLocalCache {
-    func increaseCounter() {
-        if cache.countLimit > threadSafeCount.value {
-            threadSafeCount.value += 1
-        }
-    }
-    func decreaseCounter() {
-        if threadSafeCount.value > 0 {
-            threadSafeCount.value -= 1
-        }
     }
 }

@@ -40,9 +40,6 @@ protocol PhotosSearchTermsDelegate {
 
 final class PhotosViewModel<IRManager, IRequest>: PhotosViewModelProtocol where IRManager: ImageLoader,
                                                                                IRManager.Request == IRequest {
-    
-    
-    
     //MARK: - Private properties
     private let networkManager: PhotosNetworkService
     private let imageRequestHTTPClient: HTTPClient
@@ -89,8 +86,7 @@ final class PhotosViewModel<IRManager, IRequest>: PhotosViewModelProtocol where 
     
     func getPhotos() {
         recentPhotosState.value = .loading
-        networkManager.getRecentPhotos(forPage: 1,
-                                       pageSize: pageSize,
+        networkManager.getRecentPhotos(byPage: Page(number: 1, size: pageSize),
                                        processResultOfLoadedPhotos)
     }
 }
@@ -104,7 +100,7 @@ extension PhotosViewModel: PhotosDataSource {
             let imageRequest = IRequest(url: url,
                                         timeout: 60,
                                         client: imageRequestHTTPClient)
-            imageRequestsManager.runAndCacheResult(of: imageRequest, receiveOn: .main) { image in
+            imageRequestsManager.load(imageRequest, receiveOn: .main) { image in
                 image?.prepareForDisplay { preparedImage in
                     DispatchQueue.main.async {
                         finished(preparedImage)
@@ -128,9 +124,8 @@ extension PhotosViewModel: PhotosDataSource {
         if case .idle = nextPagePhotosState.value,
            let nextPage = photosResponse?.pageInfo.nextPage {
             nextPagePhotosState.value = .loading
-            networkManager.loadNextPhotosPage(for: selectedSearchTerm.value,
-                                              page: nextPage,
-                                              pageSize: pageSize,
+            networkManager.loadNextPhotosPage(bySearchTerm: selectedSearchTerm.value,
+                                              page: Page(number: nextPage, size: pageSize),
                                               processResultOfNextLoadedPagePhotos)
         }
     }
@@ -145,9 +140,8 @@ extension PhotosViewModel: PhotosSearchTermsDelegate {
             recentPhotosState.value = .loading
             imageRequestsManager.stopAllRequests()
             imageRequestsManager.cleanCachedData()
-            networkManager.searchPhoto(for: searchTerm,
-                                       page: 1,
-                                       pageSize: pageSize,
+            networkManager.searchPhoto(bySearchTerm: searchTerm,
+                                       page: Page(number: 1, size: pageSize),
                                        processResultOfLoadedPhotos)
         }
     }
@@ -165,10 +159,10 @@ private extension PhotosViewModel {
         if numberOfPhotos(in: indexPath.section) > indexPath.row {
             let photo = photosResponse!.pageInfo.photos[indexPath.row]
             let endpoint = PhotosHTTPRouter.photo(farm: photo.farm,
-                                                      server: photo.server,
-                                                      id: photo.id,
-                                                      secret: photo.secret,
-                                                      size: "q").endpoint
+                                                  server: photo.server,
+                                                  id: photo.id,
+                                                  secret: photo.secret,
+                                                  resolution: .q).endpoint
             if let url = try? endpoint.request().url {
                 return url
             }
@@ -221,12 +215,9 @@ private extension PhotosViewModel {
             photosResponse = response
             return
         }
-        let photos = oldPhotosPageInfo.photos+response.pageInfo.photos
-        let pageInfo = PhotosResponse.PageInfo(currentPage: response.pageInfo.currentPage,
-                                               totalPages: response.pageInfo.totalPages,
-                                               pageSize: response.pageInfo.pageSize,
-                                               totalPhotos: response.pageInfo.totalPhotos,
-                                               photos: photos)
-        photosResponse = PhotosResponse(pageInfo: pageInfo)
+        var newPhotos = Photos()
+        newPhotos.append(contentsOf: oldPhotosPageInfo.photos)
+        newPhotos.append(contentsOf: response.pageInfo.photos)
+        photosResponse = response.new(forNewPhotos: newPhotos)
     }
 }

@@ -10,7 +10,8 @@ import UIKit
 
 protocol PhotosCollectionViewDataProviderProtocol: UICollectionViewDelegate,
                                                    UICollectionViewDataSource,
-                                                   UICollectionViewDelegateFlowLayout {
+                                                   UICollectionViewDelegateFlowLayout,
+                                                   UICollectionViewDataSourcePrefetching {
     func updateActivityIndicatorFooterViewHeight(_ height: CGFloat, in collectionView: UICollectionView)
     func insertItems(_ items: Array<IndexPath>, into collectionView: UICollectionView)
 }
@@ -45,28 +46,30 @@ final class PhotosCollectionViewDataSource: NSObject,
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: PhotoCollectionViewCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
         cell.setup(image: .placeholder)
+        return cell
+    }
+    func collectionView(_ collectionView: UICollectionView,
+                        willDisplay cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? PhotoCollectionViewCell else {return}
         source.startLoadingImage(at: indexPath) { image in
             cell.stopActivityIndicatorView()
             cell.setup(image: image ?? .placeholder)
-        }
-        return cell
-    }
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? PhotoCollectionViewCell else {
-            return
         }
         if source.isLoadingImage(at: indexPath) {
             cell.startActivityIndicatorView()
         }
     }
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? PhotoCollectionViewCell else {
-            return
-        }
+    func collectionView(_ collectionView: UICollectionView,
+                        didEndDisplaying cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? PhotoCollectionViewCell else {return}
         cell.stopActivityIndicatorView()
         source.stopLoadingImage(at: indexPath)
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         let interItemsSpacing: CGFloat = 1*3
         let width = (collectionView.bounds.width-interItemsSpacing)/2
         let height: CGFloat = 150
@@ -104,10 +107,26 @@ final class PhotosCollectionViewDataSource: NSObject,
         let safeArea = scrollView.safeAreaInsets
         let offsetX = scrollView.contentOffset.y+safeArea.top
         let height = UIScreen.main.bounds.height
-        let cSizeHeight = scrollView.contentSize.height-height+safeArea.top+safeArea.bottom
-        if offsetX >= cSizeHeight/2, offsetX > 0 {
+        let contentSizeHeight = scrollView.contentSize.height-height+safeArea.top+safeArea.bottom
+        if offsetX >= contentSizeHeight/2, offsetX > 0 {
             source.loadNextPhotosPage()
         }
+    }
+    func collectionView(_ collectionView: UICollectionView,
+                        prefetchItemsAt indexPaths: [IndexPath]) {
+        indexPaths.forEach { indexPath in
+            source.startLoadingImage(at: indexPath){ image in
+                if collectionView.indexPathsForVisibleItems.contains(where: {$0 == indexPath}),
+                   let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell {
+                    cell.stopActivityIndicatorView()
+                    cell.setup(image: image ?? .placeholder)
+                }
+            }
+        }
+    }
+    func collectionView(_ collectionView: UICollectionView,
+                        cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        indexPaths.forEach(source.stopLoadingImage)
     }
 }
 extension PhotosCollectionViewDataSource {

@@ -9,16 +9,13 @@ import Foundation
 
 protocol PhotosNetworkService {
     typealias CompletionHandler = (HTTPResult<PhotosResponse, Error>) -> Void
-    func getRecentPhotos(forPage page: Int,
-                         pageSize: Int,
+    func getRecentPhotos(byPage page: Page,
                          _ finished: @escaping CompletionHandler)
-    func searchPhoto(for searchTerm: String,
-                     page: Int,
-                     pageSize: Int,
+    func searchPhoto(bySearchTerm searchTerm: String,
+                     page: Page,
                      _ finished: @escaping CompletionHandler)
-    func loadNextPhotosPage(for searchTerm: String?,
-                            page: Int,
-                            pageSize: Int,
+    func loadNextPhotosPage(bySearchTerm searchTerm: String?,
+                            page: Page,
                             _ finished: @escaping CompletionHandler)
 }
 final class PhotosNetworkManager: PhotosNetworkService {
@@ -35,17 +32,15 @@ final class PhotosNetworkManager: PhotosNetworkService {
         self.decoder = decoder
     }
     
-    func searchPhoto(for searchTerm: String,
-                     page: Int,
-                     pageSize: Int,
+    func searchPhoto(bySearchTerm searchTerm: String,
+                     page: Page,
                      _ finished: @escaping CompletionHandler) {
         guard searchTerm.isNotEmpty else {
             finished(.failure(Errors.emptySearchTerm))
             return
         }
         load(.photosBy(query: searchTerm,
-                       page: page,
-                       pageSize: pageSize)) { result in
+                       page: page)) { result in
             switch result {
             case var .success(response):
                 response.searchTerm = searchTerm
@@ -57,31 +52,29 @@ final class PhotosNetworkManager: PhotosNetworkService {
             }
         }
     }
-    func getRecentPhotos(forPage page: Int,
-                         pageSize: Int,
+    func getRecentPhotos(byPage page: Page,
                          _ finished: @escaping CompletionHandler) {
-        load(.photos(page: page, pageSize: pageSize), finished)
+        load(.photos(page: page), finished)
     }
-    func loadNextPhotosPage(for searchTerm: String?,
-                            page: Int,
-                            pageSize: Int,
+    func loadNextPhotosPage(bySearchTerm searchTerm: String?,
+                            page: Page,
                             _ finished: @escaping CompletionHandler) {
         if let term = searchTerm {
-            searchPhoto(for: term, page: page, pageSize: pageSize, { result in
+            searchPhoto(bySearchTerm: term, page: page) { result in
                 guard searchTerm == term else {
                     finished(.cancelled)
                     return
                 }
                 finished(result)
-            })
+            }
         } else {
-            getRecentPhotos(forPage: page, pageSize: pageSize, { result in
+            getRecentPhotos(byPage: page) { result in
                 guard searchTerm == nil else {
                     finished(.cancelled)
                     return
                 }
                 finished(result)
-            })
+            }
         }
     }
 }
@@ -91,7 +84,7 @@ private extension PhotosNetworkManager {
               _ finished: @escaping CompletionHandler) {
         do {
             let request = try route.endpoint.request()
-            let task = client.load(request: request) {[weak self] result in
+            let task = client.load(request) {[weak self] result in
                 guard let self else {return}
                 switch result {
                 case let .success((data, httpResponse)):

@@ -44,10 +44,9 @@ final class ImageRequest: ImageURLRequest {
     
     func start(_ finished: @escaping CompletionHandler) {
         print("\n+++ Start loading image from \(urlRequest)...")
-        let _urlRequest = urlRequest
-        task = client.load(request: urlRequest) {[weak self] result in
-            guard let self else {return}
-            guard _urlRequest == urlRequest else {
+        let request = urlRequest
+        task = client.load(request) {[urlRequest] result in
+            guard request == urlRequest else {
                 print("\n--- Different urls")
                 finished(nil)
                 return
@@ -55,7 +54,7 @@ final class ImageRequest: ImageURLRequest {
             switch result {
             case let .success((data, _)):
                 if let image = UIImage(data: data) {
-                    print("\n+++ Image from URL: \(_urlRequest) has loaded")
+                    print("\n+++ Image from URL: \(request) has loaded")
                     finished(image)
                 } else {
                     print("\n--- Invalid image data")
@@ -63,7 +62,7 @@ final class ImageRequest: ImageURLRequest {
                 }
             case let .failure(error):
                 if error.isURLRequestCancelled {
-                    print("\n--- Image loading operation \(_urlRequest) is cancelled")
+                    print("\n--- Image loading operation \(request) is cancelled")
                 } else {
                     print("\n--- Error: \(error.localizedDescription)")
                 }
