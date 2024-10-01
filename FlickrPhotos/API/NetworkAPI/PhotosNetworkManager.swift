@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PhotosNetworkService {
-    typealias CompletionHandler = (HTTPResult<PhotosResponse, Error>) -> Void
+    typealias CompletionHandler = (HTTPResult<PhotosResponse>) -> Void
     func getRecentPhotos(byPage page: Page,
                          _ finished: @escaping CompletionHandler)
     func searchPhoto(bySearchTerm searchTerm: String,

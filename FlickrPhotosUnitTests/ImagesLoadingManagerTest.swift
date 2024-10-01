@@ -51,7 +51,7 @@ final class ImagesLoadingManagerTest: XCTestCase {
         let cache = ImagesLocalCache(countLimit: 100, totalCostLimit: 1024*1024*100)
         let sut = ImagesRequestsManager(buffer: buffer, cache: cache)
         
-        cache[url] = .placeholder
+        cache.set(.placeholder, forURL: url)
         
         sut.load(request(url, status: .failure), receiveOn: .main) { image in
             XCTAssertNotNil(image, "image should not be nil")

@@ -10,6 +10,7 @@ import UIKit
 @testable import FlickrPhotos
 
 class MockImageRequestHTTPClient: HTTPClient {
+    
     enum Errors: LocalizedError {
         case invalidData
     }
@@ -25,8 +26,8 @@ class MockImageRequestHTTPClient: HTTPClient {
         self.status = status
     }
     
-    func fetch(request: URLRequest, _ finished: @escaping CompletionHandler) -> HTTPClientTask {
-        let task = URLSession.shared.fetch(request: request) {[weak self] result in
+    func load(_ request: URLRequest, _ finished: @escaping CompletionHandler) -> HTTPClientTask {
+        let task = URLSession.shared.load(request) {[weak self] result in
             guard let self else {return}
             switch status {
             case .success:

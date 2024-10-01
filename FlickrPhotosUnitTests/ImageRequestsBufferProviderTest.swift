@@ -20,7 +20,7 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         let sut = ImageRequestsBufferProvider<ImageRequest>()
         
         for _ in 1...5 {
-            sut.add(request: request)
+            sut.add(request)
         }
         XCTAssertEqual(sut.count, 1)
     }
@@ -30,7 +30,7 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         
         for i in 1...count {
             let request = ImageRequest(url: URL(string: "http://test\(i)")!)
-            sut.add(request: request)
+            sut.add(request)
         }
         
         XCTAssertEqual(sut.count, count)
@@ -41,7 +41,7 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         for i in 1...5 {
             let path = "http://test\(i)"
             let request = ImageRequest(url: URL(string: path)!)
-            sut.add(request: request)
+            sut.add(request)
         }
         sut.clean()
         
@@ -52,8 +52,8 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         let request = ImageRequest(url: URL(string: "http://test")!)
         let sut = ImageRequestsBufferProvider<ImageRequest>()
         
-        sut.add(request: request)
-        sut.remove(request: request)
+        sut.add(request)
+        sut.remove(request)
         
         XCTAssertEqual(sut.count, 0)
     }
@@ -61,7 +61,7 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         let request = ImageRequest(url: URL(string: "http://test")!)
         let sut = ImageRequestsBufferProvider<ImageRequest>()
         
-        sut.add(request: request)
+        sut.add(request)
         let foundRequest = sut.request(forURL: request.url)
         
         XCTAssertNotNil(foundRequest)
@@ -70,7 +70,7 @@ final class ImageRequestsBufferProviderTest: XCTestCase {
         let request = ImageRequest(url: URL(string: "http://test")!)
         let sut = ImageRequestsBufferProvider<ImageRequest>()
         
-        sut.add(request: request)
+        sut.add(request)
         sut.removeRequest(forURL: request.url)
         
         XCTAssertEqual(sut.count, 0)

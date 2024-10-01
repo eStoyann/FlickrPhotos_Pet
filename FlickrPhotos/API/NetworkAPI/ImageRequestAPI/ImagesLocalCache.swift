@@ -9,12 +9,18 @@ import Foundation
 import UIKit
 
 protocol ImagesCache {
+    var count: Int{get}
     func image(forURL url: URL) -> UIImage?
     func set(_ image: UIImage?, forURL url: URL)
     func clean()
 }
 final class ImagesLocalCache: ImagesCache {
+    private let _count = ThreadSafeVariable(0)
     private let cache: NSCache<NSString, UIImage>
+    
+    var count: Int {
+        _count.value
+    }
     
     init(countLimit: Int = 0,
          totalCostLimit: Int = 0) {

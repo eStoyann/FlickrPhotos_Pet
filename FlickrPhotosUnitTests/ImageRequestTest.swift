@@ -11,16 +11,17 @@ import XCTest
 final class ImageRequestTest: XCTestCase {
 
     func test_run_shouldBeFinishedSuccessfully() {
+        //given
         let url = URL(string: "http://test")!
         let mock = MockImageRequestHTTPClient(status: .success)
         let sut = ImageRequest(url: url, timeout: 15, client: mock)
         let expectation = expectation(description: "wait for image")
-        
+        //when
         sut.start { image in
             XCTAssertNotNil(image)
             expectation.fulfill()
         }
-        
+        //then
         waitForExpectations(timeout: 5)
     }
     func test_run_shouldBeFail() {

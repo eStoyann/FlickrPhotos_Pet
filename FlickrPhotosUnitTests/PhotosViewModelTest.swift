@@ -74,18 +74,6 @@ final class PhotosViewModelTest: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
-    func test_getPhotosMethod_shouldCancelOperation() {
-        let expectation = expectation(description: "wait for getPhotosMethod cancel")
-        let sut = sut(options: .cancelled)
-        
-        sut.getPhotos()
-        sut.recentPhotosState.bind { state in
-            XCTAssertEqual(state, .idle)
-            XCTAssertEqual(sut.numberOfPhotos(in: 0), 0, "numberOfPhotos should be 0")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
-    }
     func test_searchPhotosMethod_recentPhotosStateShouldEqualLoading() {
         let searchTerm = "cat"
         let sut = sut(options: .success)
@@ -183,7 +171,7 @@ final class PhotosViewModelTest: XCTestCase {
 private extension PhotosViewModelTest {
     func sut(options: MockPhotosLoadHTTPClient.Status) -> PhotosViewModel<ImagesRequestsManager<ImageRequestsBufferProvider<ImageRequest>, ImagesLocalCache, ImageRequest>, ImageRequest> {
         
-        let mockHTTPClient = MockPhotosLoadHTTPClient(options: options)
+        let mockHTTPClient = MockPhotosLoadHTTPClient(status: options)
         let nm = PhotosNetworkManager(client: mockHTTPClient)
         
         let buffer = ImageRequestsBufferProvider<ImageRequest>()

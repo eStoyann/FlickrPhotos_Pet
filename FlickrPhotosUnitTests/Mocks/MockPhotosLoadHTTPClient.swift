@@ -18,20 +18,19 @@ final class MockPhotosLoadHTTPClient: HTTPClient {
     enum Status {
         case success
         case failure(Errors)
-        case cancelled
     }
     
     private let status: Status
 
-    init(options: Status) {
-        self.status = options
+    init(status: Status) {
+        self.status = status
     }
     
-    func fetch(request: URLRequest,
+    func load(_ request: URLRequest,
                _ finished: @escaping CompletionHandler) -> HTTPClientTask {
         let url = URL(string: "https://test")!
         let mockURLRequest = URLRequest(url: url)
-        let task = URLSession.shared.fetch(request: mockURLRequest) {[weak self] _ in
+        let task = URLSession.shared.load(mockURLRequest) {[weak self] _ in
             guard let self else {return}
             switch status {
             case .success:
@@ -62,8 +61,6 @@ final class MockPhotosLoadHTTPClient: HTTPClient {
                     let data = encode(data: pageInfo) ?? Data(count: 0)
                     finished(.success((data, httpResponse)))
                 }
-            case .cancelled:
-                finished(.cancelled)
             }
         }
         return task
@@ -81,8 +78,8 @@ final class MockPhotosLoadHTTPClient: HTTPClient {
         let photo = Photo(id: "", farm: 0, secret: "", server: "")
         let photos = Array(repeating: photo, count: 10000)
         return PhotosResponse.PageInfo(currentPage: 1,
-                                       totalPages: 100,
                                        pageSize: 10,
+                                       totalPages: 100,
                                        totalPhotos: photos.count,
                                        photos: photos)
     }

@@ -9,6 +9,7 @@ import Foundation
 
 protocol ImageLoader: AnyObject {
     associatedtype Request: ImageURLRequest
+    
     func load(_ request: Request,
               receiveOn queue: DispatchQueue,
               _ finished: @escaping ImageURLRequest.CompletionHandler)
@@ -24,6 +25,13 @@ final class ImagesRequestsManager<Buffer, Cache, Request>: ImageLoader where Buf
                                                                              Cache: ImagesCache {
     private let buffer: Buffer
     private let cache: Cache
+    
+    var bufferRequestsCount: Int{
+        buffer.count
+    }
+    var cachedImagesCount: Int{
+        cache.count
+    }
     
     init(buffer: Buffer, cache: Cache) {
         self.buffer = buffer

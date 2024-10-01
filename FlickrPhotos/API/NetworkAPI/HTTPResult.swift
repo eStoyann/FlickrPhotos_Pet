@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HTTPResult<T, E> where E: Error {
+enum HTTPResult<T> {
     case success(T)
     case failure(Error)
     case cancelled

@@ -19,7 +19,7 @@ final class ImagesLocalCacheTest: XCTestCase {
         let url = URL(string: "http://test")!
         let sut = sut()
         
-        sut[url] = .placeholder
+        sut.set(.placeholder, forURL: url)
         
         XCTAssertEqual(sut.count, 1, "count should be one")
     }
@@ -28,7 +28,7 @@ final class ImagesLocalCacheTest: XCTestCase {
         let sut = sut()
         
         for _ in 0..<5 {
-            sut[url] = .placeholder
+            sut.set(.placeholder, forURL: url)
         }
         
         XCTAssertEqual(sut.count, 1, "count should be one")
@@ -39,7 +39,7 @@ final class ImagesLocalCacheTest: XCTestCase {
         
         for i in 0..<five {
             let url = URL(string: "http://test\(i)")!
-            sut[url] = .placeholder
+            sut.set(.placeholder, forURL: url)
         }
         
         XCTAssertEqual(sut.count, five, "count should be one")
@@ -49,11 +49,11 @@ final class ImagesLocalCacheTest: XCTestCase {
         
         for i in 0..<5 {
             let url = URL(string: "http://test\(i)")!
-            sut[url] = .placeholder
+            sut.set(.placeholder, forURL: url)
         }
         for i in 0..<5 {
             let url = URL(string: "http://test\(i)")!
-            sut[url] = nil
+            sut.set(nil, forURL: url)
         }
         
         XCTAssertEqual(sut.count, 0, "count should be zero")
@@ -62,9 +62,9 @@ final class ImagesLocalCacheTest: XCTestCase {
         let sut = sut()
         let url = URL(string: "http://test")!
         
-        sut[url] = .placeholder
+        sut.set(.placeholder, forURL: url)
         for _ in 0..<5 {
-            sut[url] = nil
+            sut.set(nil, forURL: url)
         }
         
         XCTAssertEqual(sut.count, 0, "count should be zero")
@@ -74,7 +74,7 @@ final class ImagesLocalCacheTest: XCTestCase {
         
         for i in 0..<5 {
             let url = URL(string: "http://test\(i)")!
-            sut[url] = .placeholder
+            sut.set(.placeholder, forURL: url)
         }
         sut.clean()
         
@@ -84,19 +84,19 @@ final class ImagesLocalCacheTest: XCTestCase {
         let url = URL(string: "http://test")!
         let sut = sut()
         
-        sut[url] = .placeholder
+        sut.set(.placeholder, forURL: url)
         
-        let image = sut[url]
+        let image = sut.image(forURL: url)
         XCTAssertNotNil(image, "image should not be nil")
     }
     func test_image_shouldBeNil() {
         let url = URL(string: "http://test")!
         let sut = sut()
         
-        sut[url] = .placeholder
-        sut[url] = nil
+        sut.set(.placeholder, forURL: url)
+        sut.set(nil, forURL: url)
         
-        let image = sut[url]
+        let image = sut.image(forURL: url)
         XCTAssertNil(image, "image should be nil")
     }
     func test_count_shouldBeEqualToOneHundred() {
@@ -104,7 +104,7 @@ final class ImagesLocalCacheTest: XCTestCase {
         
         for i in 1...101 {
             let url = URL(string: "http://test\(i)")!
-            sut[url] = .placeholder
+            sut.set(.placeholder, forURL: url)
         }
         
         XCTAssertEqual(sut.count, 100, "image should be one hundred")

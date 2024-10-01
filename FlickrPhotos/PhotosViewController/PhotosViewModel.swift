@@ -181,7 +181,7 @@ private extension PhotosViewModel {
         let resultPhotosCount = oldPhotosCount+newPhotosCount
         return (oldPhotosCount..<resultPhotosCount).map({IndexPath(row: $0, section: 0)})
     }
-    func processResultOfNextLoadedPagePhotos(_ result: HTTPResult<PhotosResponse, Error>) {
+    func processResultOfNextLoadedPagePhotos(_ result: HTTPResult<PhotosResponse>) {
         weak var weakSelf = self
         guard let self = weakSelf else {return}
         switch result {
@@ -196,7 +196,7 @@ private extension PhotosViewModel {
         }
         self.nextPagePhotosState.value = .idle
     }
-    func processResultOfLoadedPhotos(_ result: HTTPResult<PhotosResponse, Error>) {
+    func processResultOfLoadedPhotos(_ result: HTTPResult<PhotosResponse>) {
         weak var weakSelf = self
         guard let self = weakSelf else {return}
         switch result {
