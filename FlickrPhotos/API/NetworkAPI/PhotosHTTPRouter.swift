@@ -68,13 +68,3 @@ private extension PhotosHTTPRouter {
     }
 }
 
-
-struct Page {
-    let number: Int
-    let size: Int
-    
-    init(number: Int = 1, size: Int = 24) {
-        self.number = number
-        self.size = size
-    }
-}
