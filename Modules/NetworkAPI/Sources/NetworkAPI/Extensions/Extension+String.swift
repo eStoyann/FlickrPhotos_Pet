@@ -1,8 +1,9 @@
 //
 //  Extension+String.swift
-//  FlickrPhotos
+//  NetworkAPI
 //
-//  Created by Evgeniy Stoyan on 16.07.2024.
+//  Created by Evgeniy Stoyan on 29.10.2024.
+//
 //
 import Foundation
 

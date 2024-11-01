@@ -1,13 +1,13 @@
 //
 //  ThreadSafeVariable.swift
-//  FlickrPhotos
+//  NetworkAPI
 //
-//  Created by Evgeniy Stoyan on 16.07.2024.
+//  Created by Evgeniy Stoyan on 29.10.2024.
 //
-
 import Foundation
 
-final class ThreadSafeVariable<T> {
+final class ThreadSafeVariable<T>: @unchecked Sendable where T: Sendable{
+    
     private var val: T
     private let queue = DispatchQueue(label: "thread_safe_queue",
                                       attributes: .concurrent)

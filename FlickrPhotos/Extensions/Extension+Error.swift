@@ -6,14 +6,9 @@
 //
 
 import Foundation
+import SimpleNetworkKit
 
 extension Error {
-    private var ns: NSError {
-        self as NSError
-    }
-    var code: Int {
-        ns.code
-    }
     var isURLRequestCancelled: Bool {
         code == NSURLErrorCancelled
     }

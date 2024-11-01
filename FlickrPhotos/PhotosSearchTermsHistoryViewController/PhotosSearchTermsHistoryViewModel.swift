@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PhotosSearchTermsHistory {
-    var selectedSearchTerm: Publisher<String?>{get}
+    var onSelect: ((String) -> Void)?{get}
 }
 
 protocol PhotosSearchTermsHistoryDataSource {
@@ -23,30 +23,50 @@ extension PhotosSearchTermsHistoryDataSource {
 }
 
 final class PhotosSearchTermsHistoryViewModel: PhotosSearchTermsHistory {
+    struct UseCases {
+        let fetchSearchTerms: FetchSearchTermsUseCase
+    }
+    private let useCases: UseCases
+    private var searchTerms: [String] {
+        useCases.fetchSearchTerms.execute()
+    }
     
-    private let storage: PhotosSearchTermsHistoryStorage
+    var onSelect: ((String) -> Void)?
     
-    let selectedSearchTerm = Publisher<String?>(initValue: nil)
-    
-    init(searchTermsHistoryLocalStorage: PhotosSearchTermsHistoryStorage) {
-        self.storage = searchTermsHistoryLocalStorage
+    init(useCases: UseCases) {
+        self.useCases = useCases
     }
 }
 //MARK: - PhotosSearchTermsHistoryDataSource
 extension PhotosSearchTermsHistoryViewModel: PhotosSearchTermsHistoryDataSource {
     func numberOfSearchTerms(in section: Int) -> Int {
-        storage.searchTerms.count
+        searchTerms.count
     }
-    
     func searchTerm(at indexPath: IndexPath) -> String? {
         if numberOfSearchTerms(in: indexPath.section) > indexPath.row {
-            return storage.searchTerms[indexPath.row]
+            return searchTerms[indexPath.row]
         }
         return nil
     }
     func didSelectSearchTerm(at indexPath: IndexPath) {
         if numberOfSearchTerms(in: indexPath.section) > indexPath.row {
-            selectedSearchTerm.value = storage.searchTerms[indexPath.row]
+            onSelect?(searchTerms[indexPath.row])
         }
+    }
+}
+
+
+protocol FetchSearchTermsUseCase {
+    func execute() -> [String]
+}
+struct RetrieveSearchTermsUseCase: FetchSearchTermsUseCase {
+    private let repo: SearchTermsRepository
+    
+    init(repo: SearchTermsRepository) {
+        self.repo = repo
+    }
+    
+    func execute() -> [String] {
+        repo.fetchSearchTerms()
     }
 }

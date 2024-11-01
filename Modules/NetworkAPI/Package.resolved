@@ -1,0 +1,15 @@
+{
+  "originHash" : "fcf16b2eae2648e55b31869a3661f87fdf1e311a203d39af7e1113e4be14f83e",
+  "pins" : [
+    {
+      "identity" : "simplenetworkkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/eStoyann/SimpleNetworkKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7babe2dfd6587537106bb0e388141b5482e61450"
+      }
+    }
+  ],
+  "version" : 3
+}

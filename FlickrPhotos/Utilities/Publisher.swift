@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Publisher<Value> {
+class Publisher<Value> where Value: Equatable {
     typealias Observer = (Value) -> Void
     
     //MARK: - Private properties
@@ -16,12 +16,14 @@ class Publisher<Value> {
     //MARK: - Public properties
     public var value: Value {
         didSet {
-            observer?(value)
+            if oldValue != value {
+                observer?(value)
+            }
         }
     }
     //MARK: - Lifecycle
-    init(initValue: Value) {
-        self.value = initValue
+    init(_ value: Value) {
+        self.value = value
     }
     //MARK: - Public methods
     func bind(_ observer: @escaping Observer) {

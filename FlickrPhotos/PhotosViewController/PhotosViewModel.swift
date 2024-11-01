@@ -4,54 +4,30 @@
 //
 //  Created by Evgeniy Stoyan on 19.07.2024.
 //
-
-import Foundation
 import UIKit
+import NetworkAPI
+import DomainModels
 
-protocol PhotosDataSource {
-    var numberOfSectionsOfPhotos: Int{get}
+final class PhotosViewModel: PhotosViewModelProtocol {
+    struct UseCases {
+        let fetchRecentPhotos: FetchRecentFlickrPhotosUseCase
+        let searchPhotos: SearchFlickrPhotosUseCase
+        let fetchNextPhotosPage: FetchNextFlickrPhotosPageUseCase
+        let stopAllRequestsAndCleanCache: StopAllRequestsAndCleanCacheUseCase
+        let startLoadingPhoto: StartLoadingFlickrPhotoUseCase
+        let stopLoadingPhoto: StopLoadingFlickrPhotoUseCase
+        let getStatusOfLoadingPhoto: GetStatusOfLoadingFlickrPhotoUseCase
+        let storeSearchTerm: StoreSearchTermUseCase
+    }
     
-    func numberOfPhotos(in section: Int) -> Int
-    func startLoadingImage(at indexPath: IndexPath, _ finished: @escaping (UIImage?) -> Void)
-    func isLoadingImage(at indexPath: IndexPath) -> Bool
-    func stopLoadingImage(at indexPath: IndexPath)
-    func loadNextPhotosPage()
-}
-extension PhotosDataSource {
-    var numberOfSectionsOfPhotos: Int{1}
-}
-
-protocol PhotosViewModelProtocol {
-    
-    var title: String {get}
-    var searchBarPlaceholder: String {get}
-    var photosSearchTermsHistoryViewModel: PhotosSearchTermsHistoryViewModel {get}
-    var selectedSearchTerm: Publisher<String?>{get}
-    var nextPagePhotosState: Publisher<State<Array<IndexPath>>>{get}
-    var recentPhotosState: Publisher<State<Bool>>{get}
-    
-    func getPhotos()
-}
-
-protocol PhotosSearchTermsDelegate {
-    func search(for searchTerm: String)
-    func cleanSelectedSearchTerm()
-}
-
-final class PhotosViewModel<IRManager, IRequest>: PhotosViewModelProtocol where IRManager: ImageLoader,
-                                                                               IRManager.Request == IRequest {
     //MARK: - Private properties
-    private let networkManager: PhotosNetworkService
-    private let imageRequestHTTPClient: HTTPClient
-    private let imageRequestsManager: IRManager
-    private let searchTermsHistoryStorage: PhotosSearchTermsHistoryStorage
-    private var photosResponse: PhotosResponse?
-    private let pageSize = 24
+    private var flickrResponse: FlickrResponse?
+    private let useCases: UseCases
     
     //MARK: - Public properties
-    let selectedSearchTerm = Publisher<String?>(initValue: nil)
-    let nextPagePhotosState = Publisher<State<Array<IndexPath>>>(initValue: .idle)
-    let recentPhotosState = Publisher<State<Bool>>(initValue: .idle)
+    let selectedSearchTerm = Publisher<String?>(nil)
+    let loadNextPhotosPageOperationStatus = OperationStatus<[IndexPath], Error>.publisher
+    let loadRecentPhotosOperationStatus = OperationStatus<Bool, Error>.publisher
     var title: String {
         "Flickr Photos"
     }
@@ -59,14 +35,17 @@ final class PhotosViewModel<IRManager, IRequest>: PhotosViewModelProtocol where 
         "Search photos"
     }
     var photosSearchTermsHistoryViewModel: PhotosSearchTermsHistoryViewModel {
-        let storage = PhotosSearchTermsHistoryLocalStorage()
-        let viewModel = PhotosSearchTermsHistoryViewModel(searchTermsHistoryLocalStorage: storage)
-        viewModel.selectedSearchTerm.bind {[weak self] searchTerm in
+        let storage = SearchTermsHistoryLocalStorage()
+        let repo = SearchTermsRepo(storage: storage)
+        let fetchSearchTerms = RetrieveSearchTermsUseCase(repo: repo)
+        let useCases = PhotosSearchTermsHistoryViewModel.UseCases(fetchSearchTerms: fetchSearchTerms)
+        let viewModel = PhotosSearchTermsHistoryViewModel(useCases: useCases)
+        viewModel.onSelect = {[weak self] searchTerm in
             guard let self else {return}
-            guard let searchTerm else {return}
-            if searchTerm != selectedSearchTerm.value {
+            if selectedSearchTerm.value != searchTerm {
                 search(for: searchTerm)
             } else {
+                selectedSearchTerm.value = nil
                 selectedSearchTerm.value = searchTerm
             }
         }
@@ -74,59 +53,77 @@ final class PhotosViewModel<IRManager, IRequest>: PhotosViewModelProtocol where 
     }
     
     //MARK: - Lifecycle
-    init(networkManager: PhotosNetworkService,
-         imageRequestsManager: IRManager,
-         imageRequestHTTPClient: HTTPClient,
-         photosSearchTermsHistoryLocalStorage: PhotosSearchTermsHistoryStorage) {
-        self.networkManager = networkManager
-        self.imageRequestsManager = imageRequestsManager
-        self.searchTermsHistoryStorage = photosSearchTermsHistoryLocalStorage
-        self.imageRequestHTTPClient = imageRequestHTTPClient
+    init(useCases: UseCases) {
+        self.useCases = useCases
     }
     
+    //MARK: - Public methods
     func getPhotos() {
-        recentPhotosState.value = .loading
-        networkManager.getRecentPhotos(byPage: Page(number: 1, size: pageSize),
-                                       processResultOfLoadedPhotos)
+        useCases.stopAllRequestsAndCleanCache.execute()
+        loadRecentPhotosOperationStatus.value = .performing
+        useCases.fetchRecentPhotos.execute {[weak self] result in
+            guard let self else {return}
+            switch result {
+            case let .success(response):
+                self.flickrResponse = response
+                self.loadRecentPhotosOperationStatus.value = .performed(true)
+            case let .failure(error):
+                self.loadRecentPhotosOperationStatus.value = .failed(error)
+            case .cancelled:
+                break
+            }
+            self.loadRecentPhotosOperationStatus.value = .idle
+        }
     }
 }
 //MARK: - PhotosDataSource
 extension PhotosViewModel: PhotosDataSource {
     func numberOfPhotos(in section: Int) -> Int {
-        photosResponse?.pageInfo.photos.count ?? 0
+        flickrResponse?.page.photos.count ?? 0
     }
-    func startLoadingImage(at indexPath: IndexPath, _ finished: @escaping (UIImage?) -> Void) {
-        if let url = url(at: indexPath) {
-            let imageRequest = IRequest(url: url,
-                                        timeout: 60,
-                                        client: imageRequestHTTPClient)
-            imageRequestsManager.load(imageRequest, receiveOn: .main) { image in
+    func startLoadingImage(at indexPath: IndexPath,
+                           _ finished: @escaping (UIImage?) -> Void) {
+        guard let url = url(at: indexPath) else {return}
+        useCases.startLoadingPhoto.execute(for: url) { image in
                 image?.prepareForDisplay { preparedImage in
                     DispatchQueue.main.async {
                         finished(preparedImage)
                     }
                 } ?? finished(nil)
             }
-        }
     }
     func isLoadingImage(at indexPath: IndexPath) -> Bool {
         if let url = url(at: indexPath) {
-            return imageRequestsManager.isActiveRequest(forURL: url)
+            return useCases.getStatusOfLoadingPhoto.execute(for: url)
         }
         return false
     }
     func stopLoadingImage(at indexPath: IndexPath) {
         if let url = url(at: indexPath) {
-            imageRequestsManager.stopRequest(forURL: url)
+            useCases.stopLoadingPhoto.execute(for: url)
         }
     }
     func loadNextPhotosPage() {
-        if case .idle = nextPagePhotosState.value,
-           let nextPage = photosResponse?.pageInfo.nextPage {
-            nextPagePhotosState.value = .loading
-            networkManager.loadNextPhotosPage(bySearchTerm: selectedSearchTerm.value,
-                                              page: Page(number: nextPage, size: pageSize),
-                                              processResultOfNextLoadedPagePhotos)
+        if !loadNextPhotosPageOperationStatus.value.inProgress,
+           let nextPage = flickrResponse?.page.next {
+            loadNextPhotosPageOperationStatus.value = .performing
+            useCases
+                .fetchNextPhotosPage
+                .execute(by: selectedSearchTerm.value,
+                         for: nextPage) {[weak self] result in
+                    guard let self else {return}
+                    switch result {
+                    case let .success(response):
+                        let indices = self.indices(of: response.page)
+                        self.updatePhotosResponse(byNewOne: response)
+                        self.loadNextPhotosPageOperationStatus.value = .performed(indices)
+                    case let .failure(error):
+                        self.loadNextPhotosPageOperationStatus.value = .failed(error)
+                    case .cancelled:
+                        break
+                    }
+                    self.loadNextPhotosPageOperationStatus.value = .idle
+                }
         }
     }
 }
@@ -135,21 +132,28 @@ extension PhotosViewModel: PhotosSearchTermsDelegate {
     func search(for searchTerm: String) {
         guard searchTerm.isNotEmpty else {return}
         selectedSearchTerm.value = searchTerm
-        searchTermsHistoryStorage.add(searchTerm: searchTerm)
-        if case .idle = recentPhotosState.value {
-            recentPhotosState.value = .loading
-            imageRequestsManager.stopAllRequests()
-            imageRequestsManager.cleanCachedData()
-            networkManager.searchPhoto(bySearchTerm: searchTerm,
-                                       page: Page(number: 1, size: pageSize),
-                                       processResultOfLoadedPhotos)
+        useCases.storeSearchTerm.execute(searchTerm)
+        if !loadRecentPhotosOperationStatus.value.inProgress {
+            useCases.stopAllRequestsAndCleanCache.execute()
+            loadRecentPhotosOperationStatus.value = .performing
+            useCases.searchPhotos.execute(by: searchTerm) {[weak self] result in
+                    guard let self else {return}
+                    switch result {
+                    case let .success(response):
+                        self.flickrResponse = response
+                        self.loadRecentPhotosOperationStatus.value = .performed(true)
+                    case let .failure(error):
+                        self.loadRecentPhotosOperationStatus.value = .failed(error)
+                    case .cancelled:
+                        break
+                    }
+                    self.loadRecentPhotosOperationStatus.value = .idle
+                }
         }
     }
     func cleanSelectedSearchTerm() {
         if selectedSearchTerm.value != nil {
             selectedSearchTerm.value = nil
-            imageRequestsManager.stopAllRequests()
-            imageRequestsManager.cleanCachedData()
             getPhotos()
         }
     }
@@ -157,67 +161,38 @@ extension PhotosViewModel: PhotosSearchTermsDelegate {
 private extension PhotosViewModel {
     func url(at indexPath: IndexPath) -> URL? {
         if numberOfPhotos(in: indexPath.section) > indexPath.row {
-            let photo = photosResponse!.pageInfo.photos[indexPath.row]
-            let endpoint = PhotosHTTPRouter.photo(farm: photo.farm,
-                                                  server: photo.server,
-                                                  id: photo.id,
-                                                  secret: photo.secret,
-                                                  resolution: .q).endpoint
+            let photo = flickrResponse!.page.photos[indexPath.row]
+            let endpoint = FlickrPhotosHTTPRouter.photo(farm: photo.farm,
+                                                        server: photo.server,
+                                                        id: photo.id,
+                                                        secret: photo.secret,
+                                                        resolution: .q).endpoint
             if let url = try? endpoint.request().url {
                 return url
             }
         }
         return nil
     }
-    func newPagePhotosIndices(of newPageInfo: PhotosResponse.PageInfo) -> Array<IndexPath> {
-        guard !newPageInfo.photos.isEmpty else {
+    func indices(of page: FlickrResponse.Page) -> Array<IndexPath> {
+        guard !page.photos.isEmpty else {
             return []
         }
-        guard let oldPageInfo = photosResponse?.pageInfo else {
-            return newPageInfo.photos.indices.map{IndexPath(row: $0, section: 0)}
+        guard let oldPage = flickrResponse?.page else {
+            return page.photos.indices.map{IndexPath(row: $0, section: 0)}
         }
-        let oldPhotosCount = oldPageInfo.photos.count
-        let newPhotosCount = newPageInfo.photos.count
-        let resultPhotosCount = oldPhotosCount+newPhotosCount
-        return (oldPhotosCount..<resultPhotosCount).map({IndexPath(row: $0, section: 0)})
+        let oldPhotosCount = oldPage.photos.count
+        let newPhotosCount = page.photos.count
+        let allPhotosCount = oldPhotosCount+newPhotosCount
+        return (oldPhotosCount..<allPhotosCount).map{IndexPath(row: $0, section: 0)}
     }
-    func processResultOfNextLoadedPagePhotos(_ result: HTTPResult<PhotosResponse>) {
-        weak var weakSelf = self
-        guard let self = weakSelf else {return}
-        switch result {
-        case let .success(response):
-            let indices = self.newPagePhotosIndices(of: response.pageInfo)
-            self.updatePhotosResponse(byNewOne: response)
-            self.nextPagePhotosState.value = .loaded(indices)
-        case let .failure(error):
-            self.nextPagePhotosState.value = .failure(error)
-        case .cancelled:
-            break
-        }
-        self.nextPagePhotosState.value = .idle
-    }
-    func processResultOfLoadedPhotos(_ result: HTTPResult<PhotosResponse>) {
-        weak var weakSelf = self
-        guard let self = weakSelf else {return}
-        switch result {
-        case let .success(response):
-            self.photosResponse = response
-            self.recentPhotosState.value = .loaded(true)
-        case let .failure(error):
-            self.recentPhotosState.value = .failure(error)
-        case .cancelled:
-            break
-        }
-        self.recentPhotosState.value = .idle
-    }
-    func updatePhotosResponse(byNewOne response: PhotosResponse) {
-        guard let oldPhotosPageInfo = photosResponse?.pageInfo else {
-            photosResponse = response
+    func updatePhotosResponse(byNewOne response: FlickrResponse) {
+        guard let oldResponse = flickrResponse else {
+            flickrResponse = response
             return
         }
-        var newPhotos = Photos()
-        newPhotos.append(contentsOf: oldPhotosPageInfo.photos)
-        newPhotos.append(contentsOf: response.pageInfo.photos)
-        photosResponse = response.new(forNewPhotos: newPhotos)
+        var photos = FlickrResponse.Page.Photos()
+        photos.append(contentsOf: oldResponse.page.photos)
+        photos.append(contentsOf: response.page.photos)
+        flickrResponse = response.new(by: photos)
     }
 }

@@ -11,6 +11,7 @@ import UIKit
 class LoaderView: UIView {
     
     //MARK: - Private property
+    private var animator = Animator()
     private lazy var blurView: UIVisualEffectView = {
         let effect = UIBlurEffect(style: UIBlurEffect.Style.light)
         let effectView = UIVisualEffectView(effect: effect)
@@ -45,20 +46,23 @@ class LoaderView: UIView {
                         _ completion: ((Bool) -> Void)? = nil) {
         guard !spinner.isAnimating else {return}
         spinner.startAnimating()
-        let animation = LoaderViewAnimationFactory.present(view: self,
-                                                           duration: duration,
-                                                           delay: delay).animation
-        animation.run(completion)
+        let config = LoaderViewAnimationFactory.Configuration(duration: duration, delay: delay)
+        let animation = LoaderViewAnimationFactory.present(view: self, config: config).animation
+        animator
+            .add(animation)
+            .run(completion)
     }
     func stopAnimation(duration: TimeInterval = 0.25,
                        delay: Double = 0,
                        _ completion: (() -> Void)? = nil) {
         guard spinner.isAnimating else {return}
-        let animation = LoaderViewAnimationFactory.hide(view: self,
-                                                        duration: duration,
-                                                        delay: delay).animation
-        animation.run {[weak self] _ in
+        let config = LoaderViewAnimationFactory.Configuration(duration: duration, delay: delay)
+        let animation = LoaderViewAnimationFactory.hide(view: self, config: config).animation
+        animator
+            .add(animation)
+            .run {[weak self] _ in
             self?.spinner.stopAnimating()
+            self?.removeFromSuperview()
             completion?()
         }
         
@@ -83,98 +87,4 @@ extension UIView {
 
 
 
-protocol AnimationFactory {
-    var animation: Animation {get}
-}
-
-
-enum LoaderViewAnimationFactory: AnimationFactory {
-    case present(view: UIView, duration: CGFloat, delay: CGFloat)
-    case hide(view: UIView, duration: CGFloat, delay: CGFloat)
-    
-    var animation: Animation {
-        switch self {
-        case let .present(view, duration, delay):
-            return Animation { finished in
-                UIView.animate(withDuration: duration,
-                               delay: delay,
-                               options: .curveEaseInOut) {
-                    view.alpha = 1
-                } completion: { isFinished in
-                    finished?(isFinished)
-                }
-            }
-        case let .hide(view, duration, delay):
-            return Animation { finished in
-                UIView.animate(withDuration: duration,
-                               delay: delay,
-                               options: .curveEaseInOut) {
-                    view.alpha = 0
-                } completion: { isFinished in
-                    finished?(isFinished)
-                    view.removeFromSuperview()
-                }
-            }
-        }
-    }
-}
-
-class Animation {
-    typealias Completion = (Bool) -> Void
-    typealias Body = (Completion?) -> Void
-    
-    private let body: Body
-    private let id = UUID()
-    private(set) var isAnimating = false
-    private var previous: Animation?
-    private var next: Animation?
-    private var isLast: Bool {
-        next == nil
-    }
-    private var isFirst: Bool {
-        previous == nil
-    }
-    
-    init(_ body: @escaping Body) {
-        self.body = body
-    }
-    
-    func combine(with animation: Animation) -> Animation {
-        if !isLast {
-            _ = next!.combine(with: animation)
-        } else {
-            next = animation
-            next!.previous = self
-        }
-        return self
-    }
-    func run(_ completion: Completion?) {
-        if !isAnimating {
-            isAnimating = true
-            body {[weak self] isFinished in
-                guard let self else {return}
-                if isFinished && self.next != nil {
-                    self.next?.run {
-                        self.isAnimating = false
-                        completion?($0)
-                        self.previous = nil
-                        self.next = nil
-                    }
-                } else {
-                    isAnimating = false
-                    completion?(isFinished)
-                }
-            }
-        }
-    }
-    
-    deinit {
-        print(String(describing: self))
-    }
-}
-extension Animation: CustomStringConvertible{
-    var description: String {
-        "Animation(\(id))"
-    }
-}
 

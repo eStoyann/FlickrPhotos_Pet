@@ -32,7 +32,7 @@ class PhotosSearchTermsHistoryViewController: UIViewController {
     
     //MARK: - Private methods
     private func setupUI() {
-        tableViewDataSource = PhotosSearchTermsHistoryTableViewDataSource(source: viewModel)
+        tableViewDataSource = SearchTermsHistoryTableViewDataSource(source: viewModel)
         searchTermsHistoryTableView.delegate = tableViewDataSource
         searchTermsHistoryTableView.dataSource = tableViewDataSource
         searchTermsHistoryTableView.register(SearchTermTableViewCell.self)
